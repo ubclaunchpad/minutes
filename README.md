@@ -1,6 +1,6 @@
 # minutes
 
-Audio speaker recognition and transcription API.
+Audio speaker diarization and transcription API.
 
 ## :running: Getting Started
 
