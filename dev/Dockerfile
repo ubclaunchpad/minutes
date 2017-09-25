@@ -1,7 +1,7 @@
 # Start from base image and add development tooling on top.
 FROM minutes-prod:latest
 
-# Add additional developments.
+# Add additional development requirements.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
 RUN pip install -r /env/requirements-dev.txt
 

@@ -8,9 +8,5 @@ script:
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-    docker tag $DEV_IMAGE:$TAG $ORGANIZATION/$DEV_IMAGE:$TAG;
-    docker push $ORGANIZATION/$DEV_IMAGE:$TAG;
-    docker tag $PROD_IMAGE:$TAG $ORGANIZATION/$PROD_IMAGE:$TAG;
-    docker push $ORGANIZATION/$PROD_IMAGE:$TAG;
-    fi;
+    make push-dev; make push-prod;
+    fi
