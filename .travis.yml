@@ -1,0 +1,16 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - make
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "dev" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker tag $DEV_IMAGE_NAME:$TAG $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
+    docker push $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
+    docker tag $PROD_IMAGE_NAME:$TAG $ORGANIZATION/$PROD_IMAGE_NAME:$TAG
+    docker push $ORGANIZATION/$PROD_IMAGE_NAME:$TAG
+    fi
