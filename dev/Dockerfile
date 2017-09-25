@@ -1,5 +1,5 @@
 # Start from base image and add development tooling on top.
-FROM cyclo-brain-prod:latest
+FROM minutes-prod:latest
 
 # Add additional developments.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
