@@ -7,7 +7,7 @@ script:
   - make
 
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "dev" ]; then
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker tag $DEV_IMAGE:$TAG $ORGANIZATION/$DEV_IMAGE:$TAG;
     docker push $ORGANIZATION/$DEV_IMAGE:$TAG;
