@@ -4,7 +4,7 @@ services:
   - docker
 
 script:
-  - echo "Nothing to see here..."
+  - make
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then
