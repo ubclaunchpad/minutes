@@ -1,0 +1,14 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - echo "Nothing to see here..."
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "dev" ]; then
+    chmod +x ./bin/push-docker.sh
+    ./bin/push-docker.sh minutes-dev
+    ./bin/push-docker.sh minutes-prod
+    fi
