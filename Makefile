@@ -29,3 +29,13 @@ build-dev:
 	docker build --rm \
 			-f ./dev/Dockerfile \
 			-t $(DEV_IMAGE_NAME) .
+
+push-dev:
+		docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" && \
+    	docker tag $DEV_IMAGE_NAME:$TAG $ORGANIZATION/$DEV_IMAGE_NAME:$TAG && \
+    	docker push $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
+
+push-prod:
+		docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" && \
+    	docker tag $DEV_IMAGE_NAME:$TAG $ORGANIZATION/$DEV_IMAGE_NAME:$TAG && \
+    	docker push $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
