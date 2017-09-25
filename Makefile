@@ -23,9 +23,9 @@ dev:
 			$(DEV_IMAGE_NAME)
 
 build-prod:
-	docker build -t $(PROD_IMAGE_NAME) .
+	docker build --rm -t $(PROD_IMAGE_NAME) .
 
 build-dev:
-	docker build \
+	docker build --rm \
 			-f ./dev/Dockerfile \
 			-t $(DEV_IMAGE_NAME) .
