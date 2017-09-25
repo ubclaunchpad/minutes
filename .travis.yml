@@ -8,7 +8,9 @@ script:
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then
-    chmod +x ./bin/push-docker.sh
-    ./bin/push-docker.sh minutes-dev
-    ./bin/push-docker.sh minutes-prod
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker tag $DEV_IMAGE_NAME:$TAG $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
+    docker push $ORGANIZATION/$DEV_IMAGE_NAME:$TAG
+    docker tag $PROD_IMAGE_NAME:$TAG $ORGANIZATION/$PROD_IMAGE_NAME:$TAG
+    docker push $ORGANIZATION/$PROD_IMAGE_NAME:$TAG
     fi
