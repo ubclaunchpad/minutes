@@ -13,4 +13,4 @@ after_success:
     docker push $ORGANIZATION/$DEV_IMAGE_NAME:$TAG;
     docker tag $PROD_IMAGE_NAME:$TAG $ORGANIZATION/$PROD_IMAGE_NAME:$TAG;
     docker push $ORGANIZATION/$PROD_IMAGE_NAME:$TAG;
-    fi
+    fi;
