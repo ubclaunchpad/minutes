@@ -9,4 +9,4 @@ script:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then
     make push-dev; make push-prod;
-    fi;
+    fi

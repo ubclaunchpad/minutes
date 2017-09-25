@@ -6,7 +6,7 @@ DEV_IMAGE_NAME=minutes-dev
 PROD_PORT=80
 DEV_PORT=8080
 
-.PHONY: dev
+.PHONY: dev run build-prod build-dev push-dev push-prod
 
 all: build-prod build-dev
 
