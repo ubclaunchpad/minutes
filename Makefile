@@ -53,5 +53,5 @@ push-dev:
 
 push-prod:
 	docker login -u=$(DOCKER_USERNAME) -p=$(DOCKER_PASSWORD) && \
-		docker tag $(PROD_LOCAL)) $(PROD_REMOTE) && \
+		docker tag $(PROD_LOCAL) $(PROD_REMOTE) && \
 		docker push $(PROD_REMOTE)
