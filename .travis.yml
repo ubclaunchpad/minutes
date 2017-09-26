@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - make
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    make push-dev; make push-prod;
+    fi
