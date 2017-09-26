@@ -23,20 +23,20 @@ DEV_PORT=8080
 all: build-prod build-dev
 
 run:
-	docker rm -f $(PROD_CONTAINER) && \
-		docker run -it \
-			--name $(PROD_IMAGE_NAME) \
-			-p $(PROD_PORT):$(PROD_PORT) \
-			$(PROD_IMAGE_NAME)
+	docker rm -f $(PROD_CONTAINER) 2>> /dev/null || true 
+	docker run -it \
+		--name $(PROD_IMAGE_NAME) \
+		-p $(PROD_PORT):$(PROD_PORT) \
+		$(PROD_IMAGE_NAME)
 
 dev:
 	@echo "Opening dev environment on localhost port $(DEV_PORT)."
-	docker rm -f $(DEV_CONTAINER) && \
-		docker run -d \
-			--name $(DEV_IMAGE_NAME) \
-			-v `pwd`/nb:/nb \
-			-p $(DEV_PORT):$(DEV_PORT) \
-			$(DEV_IMAGE_NAME)
+	docker rm -f $(DEV_CONTAINER) 2>> /dev/null || true 
+	docker run --rm -d \
+		--name $(DEV_IMAGE_NAME) \
+		-v `pwd`/nb:/nb \
+		-p $(DEV_PORT):$(DEV_PORT) \
+		$(DEV_IMAGE_NAME)
 
 build-prod:
 	docker build --rm -t $(PROD_IMAGE_NAME) .
