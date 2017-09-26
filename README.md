@@ -9,23 +9,24 @@ Audio speaker diarization and transcription API.
 ## :running: Getting Started
 
 
-### Running the Server
+### :rocket: Running the Server
 
 ```
 make
 make run
 ```
 
-### Running the Research Environment
+### :rainbow: Running the Research Environment
 
 ```
-make
 make dev
 ```
 
 ## :point_up: Deployment
 
-We deploy continuously using Travis CI and a Docker Hub deploy bot. You can also deploy the production and development images manually using,
+We deploy continuously using Travis CI and a Docker Hub deploy bot. 
+
+You can also deploy the production and development images manually if you like.
 
 ```
 make push-dev
