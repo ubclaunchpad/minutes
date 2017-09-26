@@ -48,7 +48,7 @@ build-dev:
 
 push-dev:
 	docker login -u=$(DOCKER_USERNAME) -p=$(DOCKER_PASSWORD) && \
-		docker tag $(DEV_LOCAL) $(DEV_REMOTE)
+		docker tag $(DEV_LOCAL) $(DEV_REMOTE) && \
 		docker push $(DEV_REMOTE)
 
 push-prod:
