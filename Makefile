@@ -56,5 +56,5 @@ push-prod:
 		docker tag $(PROD_LOCAL) $(PROD_REMOTE) && \
 		docker push $(PROD_REMOTE)
 
-collect-nb:
+push-nb:
 	scp -i ~/.ssh/id_minutes -r root@165.227.0.96:/research/nb nb
