@@ -57,4 +57,4 @@ push-prod:
 		docker push $(PROD_REMOTE)
 
 pull-nb:
-	scp -i ~/.ssh/id_minutes -r root@165.227.0.96:/research/nb nb
+	scp -i ~/.ssh/id_minutes -r root@165.227.0.96:/research/nb/ .
