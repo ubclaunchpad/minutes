@@ -1,6 +1,9 @@
 # Start from base image and add development tooling on top.
 FROM minutes-prod:latest
 
+# Audio codec.
+RUN apt-get install -y libav-tools
+
 # Add additional development requirements.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
 RUN pip install -r /env/requirements-dev.txt

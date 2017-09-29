@@ -1,5 +1,8 @@
 librosa==0.5.1
 speechpy==1.1
+pandas==0.20.2
+seaborn==0.8.1
 
 # Unpinned, we want to use latest updates.
 jupyterlab
+matplotlib
