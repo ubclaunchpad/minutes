@@ -3,6 +3,8 @@ speechpy==1.1
 pandas==0.20.2
 seaborn==0.8.1
 python_speech_features==0.6
+xmltodict==0.11.0
+pydub==0.20.0
 
 # Unpinned, we want to use latest updates.
 jupyterlab
