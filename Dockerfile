@@ -20,5 +20,6 @@ WORKDIR /app/
 # Expose for production.
 EXPOSE 80
 
-# Just drop into the shell for now.
-CMD /bin/bash
+# Launch Flask app
+ENTRYPOINT [ "python3" ]
+CMD [ "main.py" ]
