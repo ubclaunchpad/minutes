@@ -12,7 +12,7 @@ ADD requirements.txt /env/requirements.txt
 RUN pip3 install -r /env/requirements.txt
 
 # Dump the app in.
-ADD app/ /app/
+ADD . /app
 
 # Head to the working directory.
 WORKDIR /app/
@@ -20,5 +20,6 @@ WORKDIR /app/
 # Expose for production.
 EXPOSE 80
 
-# Just drop into the shell for now.
-CMD /bin/bash
+# Launch Flask app
+ENTRYPOINT [ "python3" ]
+CMD [ "app/main.py" ]
