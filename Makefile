@@ -18,6 +18,10 @@ PROD_REMOTE=$(ORGANIZATION)/$(PROD_LOCAL)
 PROD_PORT=80
 DEV_PORT=8080
 
+# Digital ocean
+REMOTE_INSTANCE=root@165.227.0.96
+REMOTE_DATA_FOLDER=/research/nb/data
+
 .PHONY: all dev run build-prod build-dev push-dev push-prod
 
 all: build-prod build-dev
@@ -58,3 +62,7 @@ push-prod:
 
 pull-nb:
 	scp -i ~/.ssh/id_minutes -r root@165.227.0.96:/research/nb/ .
+
+push-data:
+	scp -i ~/.ssh/id_minutes $(FILE) \
+		$(REMOTE_INSTANCE):$(REMOTE_DATA_FOLDER)/$(FILE)
