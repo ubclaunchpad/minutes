@@ -22,7 +22,7 @@ DEV_PORT=8080
 
 all: build-prod build-dev
 
-run: build-prod
+run:
 	docker rm -f $(PROD_CONTAINER) 2>> /dev/null || true
 	docker run -it \
 		--name $(PROD_IMAGE_NAME) \
