@@ -24,11 +24,13 @@ def get_speakers(t, left, right, interior='[A-Za-z]+'):
     @param t a string with speakers in it.
     @param left a string delimiter such as '[' or ':'.
     @param right a string delimiter such as '[' or ':'.
+    @param interior a regex to capture the text between
+    the left and right delimiters.
     """
     # Prepend with slash if not empty string.
     left_fmt = '\\' + left if left else left
     right_fmt = '\\' + right if right else right
-    pattern = r"{}({}){}".format(left_fmt, right_fmt)
+    pattern = r"{}({}){}".format(left_fmt, interior, right_fmt)
     return re.findall(
         pattern=pattern,
         string=t
@@ -82,7 +84,6 @@ def create_labels(xml, left_delim, right_delim, S=44100):
         columns=speakers
     )
 
-    print('hi')
     # Each record will be used to fill some samples in result.
     for record in df.to_dict(orient='records'):
 
@@ -107,9 +108,10 @@ def create_labels(xml, left_delim, right_delim, S=44100):
                 previous_speaker = s
         else:
             # Speaker is previous speaker.
-            # TODO: This breaks if there is no speaker in
+            # This breaks if there is no speaker in
             # the first phrase. For now, let's ignore the
-            # phrase.
+            # first phrase (its normally something like
+            # [music plays] or something like).
             try:
                 result.loc[start:end, previous_speaker] = 1
             except UnboundLocalError:
@@ -124,6 +126,5 @@ if __name__ == '__main__':
     xml = requests.get(url).content.decode('utf-8')
     left_delim = ''
     right_delim = ':'
-    labels = create_labels(xml, left_delim, right_delim, S=44100)
-    # print(labels)
-    # print(sys.getsizeof(labels.as_matrix()))
+    labels = create_labels(xml, left_delim, right_delim, S=4410)
+    print(labels)
