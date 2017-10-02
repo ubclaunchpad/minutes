@@ -34,3 +34,20 @@ make push-prod
 ```
 
 You will need to set `DOCKER_USERNAME` and `DOCKER_PASSWORD` and be a member of the `ubclaunchpad` docker hub organization to deploy manually.
+
+
+## :point_right: Pushing Training Data
+
+You can push training data into the research environment on Digital Ocean. 
+You will need to collect the instance PEM file from your tech lead. Place
+the PEM locally in `~/.ssh/id_minutes`. Set the environment variable 
+`MINUTES_RESEARCH_INSTANCE` in your environment to the IP address of the
+Digital Ocean instance (available on Slack or from your tech lead).
+
+Then, if you wish to push the file `bigdata.csv`, use the following command:
+
+```bash
+make FILE=bigdata.csv push-data
+```
+
+It will appear in the `data` folder on the research platform.
