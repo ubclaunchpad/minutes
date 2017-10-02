@@ -18,6 +18,10 @@ PROD_REMOTE=$(ORGANIZATION)/$(PROD_LOCAL)
 PROD_PORT=80
 DEV_PORT=8080
 
+# Digital ocean (set this env variable MINUTES_RESEARCH_INSTANCE).
+RESEARCH_INSTANCE=${MINUTES_RESEARCH_INSTANCE}
+REMOTE_DATA_FOLDER=/research/nb/data
+
 .PHONY: all dev run build-prod build-dev push-dev push-prod
 
 all: build-prod build-dev
@@ -57,4 +61,8 @@ push-prod:
 		docker push $(PROD_REMOTE)
 
 pull-nb:
-	scp -i ~/.ssh/id_minutes -r root@165.227.0.96:/research/nb/ .
+	scp -i ~/.ssh/id_minutes -r $(REMOTE_INSTANCE):/research/nb/ .
+
+push-data:
+	scp -i ~/.ssh/id_minutes $(FILE) \
+		root@$(RESEARCH_INSTANCE):$(REMOTE_DATA_FOLDER)/$(FILE)
