@@ -10,9 +10,12 @@ if [ -z "$1" ]; then
   exit 2
 fi
 
+# Make new directory for downloaded files
+mkdir -p "$1"
+
 # Attempt to download XML transcript
-if curl --silent --fail --output "$1.xml" "${TRANSCRIPT_BASE}${1}"; then
-  echo "Downloaded transcript to $1.xml."
+if curl --silent --fail --output "$1/$1.xml" "${TRANSCRIPT_BASE}${1}"; then
+  echo "Downloaded transcript to $1/$1.xml."
 else
   echo "Unable to download transcript."
   exit 1
