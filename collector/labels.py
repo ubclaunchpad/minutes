@@ -1,3 +1,5 @@
+import json
+import os
 import re
 import sys
 
@@ -37,7 +39,8 @@ def get_speakers(t, left, right, interior='[A-Za-z]+'):
     )
 
 
-def create_labels(xml, left_delim, right_delim, S=44100):
+def create_labels(xml, left_delim, right_delim,
+                  interior='[A-Za-z]+', S=44100):
     """
     Given an XML transcription of a youtube conversation,
     returns a dataframe of binary variables specifying whether
@@ -47,9 +50,9 @@ def create_labels(xml, left_delim, right_delim, S=44100):
     @param left_delim the left delimeter on a speaker tag.
     @param right_delim the right delimiter on a speaker tag.
     @S an integer representing the sample rate of the audio;
-        if you want to split the result by seconds let S=1,
-        if you want to use the Nyquist theorem ideal sampling
-        rate, use 44100.
+    if you want to split the result by seconds let S=1,
+    if you want to use the ideal sampling rate given by the
+    Nyquist Theorem, use 44100.
     """
 
     assert 0 < S <= 44100, "S must be on [0, 441000]"
@@ -66,7 +69,8 @@ def create_labels(xml, left_delim, right_delim, S=44100):
             get_speakers(
                 t=t,
                 left=left_delim,
-                right=right_delim
+                right=right_delim,
+                interior=interior
             ) for t in df['#text'].tolist()
         ])
     )
@@ -96,7 +100,8 @@ def create_labels(xml, left_delim, right_delim, S=44100):
         speakers_in_record = get_speakers(
             t=record['#text'],
             left=left_delim,
-            right=right_delim
+            right=right_delim,
+            interior=interior
         )
 
         # See if each speaker is speaking during window.
@@ -111,7 +116,7 @@ def create_labels(xml, left_delim, right_delim, S=44100):
             # This breaks if there is no speaker in
             # the first phrase. For now, let's ignore the
             # first phrase (its normally something like
-            # [music plays] or something like).
+            # [music plays]).
             try:
                 result.loc[start:end, previous_speaker] = 1
             except UnboundLocalError:
@@ -122,9 +127,22 @@ def create_labels(xml, left_delim, right_delim, S=44100):
 
 
 if __name__ == '__main__':
-    url = 'https://www.youtube.com/api/timedtext?lang=en&v=obgTxz-x33Q'
-    xml = requests.get(url).content.decode('utf-8')
-    left_delim = ''
-    right_delim = ':'
-    labels = create_labels(xml, left_delim, right_delim, S=4410)
+    index = 1
+    with open('ids.json', 'r') as infile:
+        ids = json.loads(infile.read())
+    
+    youtube_info = ids[index]
+    xml_path = os.path.join(
+        youtube_info['id'], 
+        youtube_info['id'] + '.xml'
+    )
+
+    labels = create_labels(
+        xml=open(xml_path, 'r').read(),
+        left_delim=youtube_info['left_delim'],
+        right_delim=youtube_info['right_delim'],
+        interior='[A-Z]',
+        S=44100
+    )
+
     print(labels)
