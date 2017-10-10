@@ -5,7 +5,7 @@ import re
 
 import numpy as np
 import pandas as pd
-import python_speech_features as psf
+import speechpy as sp
 from scipy.io import wavfile
 import xmltodict
 
@@ -102,8 +102,8 @@ def extract_labels(xml, left_delim, right_delim,
     # Each record will be used to fill some samples in result.
     for i, record in enumerate(df.to_dict(orient='records')):
 
-        pct = 100.0 * i / len(df)
-        if int(pct) % 25 == 0:
+        pct = int(round(100.0 * i / len(df), 2))
+        if pct % 10 == 0:
             logger.info('{}% of texts analyzed'.format(pct))
 
         # Find the window start and end (in samples).
@@ -122,13 +122,14 @@ def extract_labels(xml, left_delim, right_delim,
         # See if each speaker is speaking during window.
         if speakers_in_record:
             for s in speakers_in_record:
-                # Leave no's as nans, backfill later.
-                # TODO: This does not split the phrase by speaker,
-                # it just pretends "all speakers are speaking right
-                # now." Not the best, do fix.
-                speaking = 1 if s in speakers_in_record else np.nan
-                result.loc[start: end, s] = speaking
-                previous_speaker = s
+                if s in speakers:
+                    # Leave no's as nans, backfill later.
+                    # TODO: This does not split the phrase by speaker,
+                    # it just pretends "all speakers are speaking right
+                    # now." Not the best, do fix.
+                    speaking = 1 if s in speakers_in_record else np.nan
+                    result.loc[start: end, s] = speaking
+                    previous_speaker = s
         else:
             # Speaker is previous speaker.
             # This breaks if there is no speaker in
@@ -141,7 +142,15 @@ def extract_labels(xml, left_delim, right_delim,
                 pass
 
     # Fill the rest with 0's.
-    return result.fillna(0)
+    logger.info('Backfilling with zeros...')
+    result.fillna(0, inplace=True)
+
+    # Convert to integers.
+    logger.info('Converting to integers...')
+    for column in result.columns:
+        result[column] = result[column].astype(int)
+
+    return result
 
 
 def extract_features(audio_file, rate):
@@ -160,16 +169,17 @@ def extract_features(audio_file, rate):
         df (pd.DataFrame): A dataframe of feature vectors.
     """
     _, data = wavfile.read(audio_file)
+    signal = data[:, 0]
 
     # Pull features.
     logger.info('Extracting mfcc...')
-    mfcc = pd.DataFrame(psf.mfcc(data, rate))
+    mfcc = pd.DataFrame(sp.mfcc(signal, rate))
     logger.info('Extracting logfbank...')
-    logfbank = pd.DataFrame(psf.logfbank(data, rate))
+    logfbank = pd.DataFrame(sp.lmfe(signal, rate))
     logger.info('Extracting fbank...')
-    fbank = pd.DataFrame(psf.fbank(data, rate))
+    fbank = pd.DataFrame(sp.mfe(signal, rate))
     logger.info('Extracting ssc...')
-    ssc = pd.DataFrame(psf.ssc(data, rate))
+    ssc = pd.DataFrame(sp.stack_frames(signal, rate))
 
     # Name columns.
     mfcc.columns = [i + '_mfcc' for i in mfcc.columns]
@@ -213,10 +223,6 @@ def build(sample_id):
     interior = info['interior']
     rate = info['rate']
 
-    # Grab features.
-    logger.info('Extracting features...')
-    features = extract_features(audio_file, rate)
-
     # Bring in xml file and pull labels.
     with open(xml_file, 'r') as xml_infile:
         logger.info('Extracting labels...')
@@ -225,15 +231,21 @@ def build(sample_id):
             left_delim=left_delim,
             right_delim=right_delim,
             interior=interior,
-            rate=44100
+            rate=rate
         )
 
+    # Grab features (this crashes due to memory at the moment).
+    # logger.info('Extracting features...')
+    # features = extract_features(audio_file, rate)
+
     # Column-bind results.
-    data = pd.concat([features, labels], axis=1)
+    # data = pd.concat([features, labels], axis=1)
+    data = labels
 
     # Dump to csv.
     output = os.path.join(sample_id, sample_id + ".csv")
 
+    logger.info('Writing to CSV (this can take a minute)...')
     with open(output, 'w') as outfile:
         data.to_csv(outfile)
 
