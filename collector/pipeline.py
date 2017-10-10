@@ -5,7 +5,7 @@ import re
 
 import numpy as np
 import pandas as pd
-import speechpy as sp
+import python_speech_features as psf
 from scipy.io import wavfile
 import xmltodict
 
@@ -168,29 +168,36 @@ def extract_features(audio_file, rate):
     Returns:
         df (pd.DataFrame): A dataframe of feature vectors.
     """
-    _, data = wavfile.read(audio_file)
-    signal = data[:, 0]
+
+    batch_size = 2**20
+    sample_rate, signal = wavfile.read(audio_file)
 
     # Pull features.
-    logger.info('Extracting mfcc...')
-    mfcc = pd.DataFrame(sp.mfcc(signal, rate))
-    logger.info('Extracting logfbank...')
-    logfbank = pd.DataFrame(sp.lmfe(signal, rate))
-    logger.info('Extracting fbank...')
-    fbank = pd.DataFrame(sp.mfe(signal, rate))
-    logger.info('Extracting ssc...')
-    ssc = pd.DataFrame(sp.stack_frames(signal, rate))
+    logger.info('Extracting feature vectors...')
+    start = 0
+    while start < len(signal):
+        # Create a batch (don't overflow the signal).
+        end = start + batch_size
+        end = end if end < len(signal)-1 else len(signal)
 
-    # Name columns.
-    mfcc.columns = [i + '_mfcc' for i in mfcc.columns]
-    logfbank.columns = [i + '_logfbank' for i in logfbank.columns]
-    fbank.columns = [i + '_fbank' for i in fbank.columns]
-    ssc.columns = [i + '_ssc' for i in ssc.columns]
+        # Get features.
+        batch = signal[start:end]
+        mfcc = psf.mfcc(batch, sample_rate, winlen=1. / rate)
+        logfbank = psf.logfbank(batch, sample_rate, winlen=1. / rate)
+        ssc = psf.ssc(batch, sample_rate, winlen=1. / rate)
 
-    # Concatenate results (column-bind).
-    df = pd.concat([mfcc, logfbank, fbank, ssc], axis=1)
+        features = np.concatenate([mfcc, logfbank, ssc], axis=1)
+        try:
+            result = np.append(result, features, axis=0)
+        except UnboundLocalError:
+            result = features
 
-    return df
+        start = end
+
+        pct = 100.0 * start / len(signal)
+        logger.info('{}% complete extracting features'.format(round(pct, 1)))
+
+    return result
 
 
 def build(sample_id):
@@ -235,12 +242,13 @@ def build(sample_id):
         )
 
     # Grab features (this crashes due to memory at the moment).
-    # logger.info('Extracting features...')
-    # features = extract_features(audio_file, rate)
+    logger.info('Extracting features...')
+    features = extract_features(audio_file, rate)
 
     # Column-bind results.
-    # data = pd.concat([features, labels], axis=1)
-    data = labels
+    logger.info('Feature shape {}'.format(features.shape))
+    logger.info('Label shape {}'.format(labels.shape))
+    data = np.append(features, labels, axis=1)
 
     # Dump to csv.
     output = os.path.join(sample_id, sample_id + ".csv")
