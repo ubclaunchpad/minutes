@@ -23,15 +23,20 @@ def get_speakers(t, left, right, interior='[A-Za-z]+'):
     Returns the speakers in the string t as specified by
     the delimiters `left' and `right'.
 
-    @param t a string with speakers in it.
-    @param left a string delimiter such as '[' or ':'.
-    @param right a string delimiter such as '[' or ':'.
-    @param interior a regex to capture the text between
-    the left and right delimiters.
+    Args:
+        t (str): a phrase from the conversation (perhaps
+            with speakers in it).
+        left (str): a left delimiter such as '[' or ''.
+        right (str): a right delimiter such as ']' or ':'.
+        interior (str) a regex to capture the text between
+            the left and right delimiters.
     """
     # Prepend with slash if not empty string.
     left_fmt = '\\' + left if left else left
     right_fmt = '\\' + right if right else right
+    
+    # There is something fancier we can do here, but this seems
+    # to be generalizing well.
     pattern = r"{}({}){}".format(left_fmt, interior, right_fmt)
     return re.findall(
         pattern=pattern,
@@ -46,13 +51,14 @@ def create_labels(xml, left_delim, right_delim,
     returns a dataframe of binary variables specifying whether
     a speaker is speaking.
 
-    @param xml string xml input encoded as utf-8.
-    @param left_delim the left delimeter on a speaker tag.
-    @param right_delim the right delimiter on a speaker tag.
-    @S an integer representing the sample rate of the audio;
-    if you want to split the result by seconds let S=1,
-    if you want to use the ideal sampling rate given by the
-    Nyquist Theorem, use 44100.
+    Args:
+        xml (str): xml input encoded as utf-8.
+        left_delim (str): the left delimeter on a speaker tag.
+        right_delim (str): the right delimiter on a speaker tag.
+        S (int) represents the sample rate of the audio in Hz;
+            if you want to split the result by seconds let S=1,
+            if you want to use the ideal sampling rate given
+            by the Nyquist Theorem, use 44100 (rather slow).
     """
 
     assert 0 < S <= 44100, "S must be on [0, 441000]"
@@ -91,7 +97,7 @@ def create_labels(xml, left_delim, right_delim,
     # Each record will be used to fill some samples in result.
     for record in df.to_dict(orient='records'):
 
-        # Find the window start and end.
+        # Find the window start and end (in samples).
         start = int(record['@start'] * S)
         end = start + int(record['@dur'] * S)
 
@@ -126,6 +132,7 @@ def create_labels(xml, left_delim, right_delim,
     return result.fillna(0)
 
 
+# Testing code - to remove.
 if __name__ == '__main__':
     index = 1
     with open('ids.json', 'r') as infile:
