@@ -114,6 +114,9 @@ def create_labels(xml, left_delim, right_delim,
         if speakers_in_record:
             for s in speakers_in_record:
                 # Leave no's as nans, backfill later.
+                # TODO: This does not split the phrase by speaker,
+                # it just pretends "all speakers are speaking right
+                # now." Not the best, do fix.
                 speaking = 1 if s in speakers_in_record else np.nan
                 result.loc[start: end, s] = speaking
                 previous_speaker = s
