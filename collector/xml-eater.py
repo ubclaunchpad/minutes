@@ -23,7 +23,7 @@ def xml_eater(xml_file, sample_rate, deliminator, discard=None):
     starts = tree.xpath("text/@start")
     texts  = [x.text.strip("\n") for x in tree.xpath("text")]
     durs   = tree.xpath("text/@dur")
-    num_seconds = int(float(starts[-1])*100) + int(float(durs[-1])*100)
+    num_seconds = int(float(starts[-1]) + float(durs[-1]))
     print("number of seconds * sample rate = %d" % (num_seconds*sample_rate))
     # list of all possible speakers, used to determine size and entries of np array
     speakers = []
@@ -36,30 +36,23 @@ def xml_eater(xml_file, sample_rate, deliminator, discard=None):
     speaker_dict = {speaker: i for i, speaker in enumerate(speakers)}
     labels = np.zeros( (num_seconds*sample_rate, len(speakers)), dtype=np.int32)
     current = None	
-    time = 0 # time, in hundredths of seconds * sample rate
     for n, text in enumerate(texts):
+        if not bool(n % 1000): print('\r' + str(n), end="")
+        sys.stdout.flush()
         start = float(starts[n])
         dur = float(durs[n])
-        while time < int(start*100)*sample_rate - 1: # add rows of zeroes at every gap between captions
-            time += 1
-            print('\r' + str(time), end="")
-            sys.stdout.flush()
         # [(m.start(0), m.end(0)) for m in re.finditer(pattern, string)]
         current = update_current_speaker(current, text, re_delim) # update current speaker
         if current is None: 
             pass
         elif not check_valid(text, re_delim, re_discard):
-            labels[sample_rate*int(start*100):sample_rate*int((start+dur)*100), :] = -1
+            labels[int(sample_rate*start):int(sample_rate*(start+dur)), :] = -1
         else:
-            newrow = [int(x==current) for x in speakers] #1 if x matches current speaker, 0 otherwise
             #for i in range(sample_rate*int(start*100), sample_rate*int((start+dur)*100)):
-            labels[sample_rate*int(start*100):sample_rate*int((start+dur)*100), speaker_dict[current]] = 1
-        time += sample_rate*int(dur*100)
-        print('\r' + str(time), end="")
-        sys.stdout.flush()
-    print('\r' + " "*len(str(time)) + '\r', end="")
+            labels[int(sample_rate*start):int(sample_rate*(start+dur)), speaker_dict[current]] = 1
+    print('\r' + " "*80 + '\r', end="")
     print(labels.shape) # just making sure the array worked
-    num_seconds = int(float(starts[-1])*100) + int(float(durs[-1])*100)
+    num_seconds = int(float(starts[-1]) + float(durs[-1]))
     logger.info('Result shape: {}'.format(labels.shape))
     logger.info('Expected shape: ({},{})'.format(sample_rate*num_seconds, len(speakers)))
     return labels
@@ -84,8 +77,8 @@ def update_current_speaker(current, text, re_delim):
     except IndexError:
         return current
 
-import time
 if __name__ == "__main__":
+    import time
     start = time.time()
     xml_eater("sample.xml", 44000, r'\[[A-Z]\]', discard=r'\(.*\)') #tested on the file given at url in issue
     print(time.time() - start)
