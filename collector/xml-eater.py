@@ -37,8 +37,9 @@ def xml_eater(xml_file, sample_rate, deliminator, discard=None):
     labels = np.zeros( (num_seconds*sample_rate, len(speakers)), dtype=np.int32)
     current = None	
     for n, text in enumerate(texts):
-        if not bool(n % 1000): print('\r' + str(n), end="")
-        sys.stdout.flush()
+        if not bool(n % 1000): 
+            print('\r' + str(n), end="\n")
+            #sys.stdout.flush()
         start = float(starts[n])
         dur = float(durs[n])
         # [(m.start(0), m.end(0)) for m in re.finditer(pattern, string)]
@@ -50,6 +51,8 @@ def xml_eater(xml_file, sample_rate, deliminator, discard=None):
         else:
             #for i in range(sample_rate*int(start*100), sample_rate*int((start+dur)*100)):
             labels[int(sample_rate*start):int(sample_rate*(start+dur)), speaker_dict[current]] = 1
+        #print(text)
+        #print(labels[int(sample_rate*start), :])
     print('\r' + " "*80 + '\r', end="")
     print(labels.shape) # just making sure the array worked
     num_seconds = int(float(starts[-1]) + float(durs[-1]))
