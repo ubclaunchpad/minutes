@@ -19,7 +19,7 @@ def xml_eater(xml_file, sample_rate, deliminator, discard=None):
                     sound effects in a consistant way, we can get rid of 
 		            those pretty easily using this param.)"""        
     # open xml and get xml tree	   
-    tree = etree.fromstring(open(xml_file).read())
+    tree = etree.fromstring(open(xml_file).read().encode('ascii'))
     starts = tree.xpath("text/@start")
     texts  = [x.text.strip("\n") for x in tree.xpath("text")]
     durs   = tree.xpath("text/@dur")
