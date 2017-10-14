@@ -3,5 +3,5 @@
     "left_delim": "[",
     "right_delim": "]",
     "interior": "[A-Z]",
-    "rate": 44100
+    "rate": 4410
 }

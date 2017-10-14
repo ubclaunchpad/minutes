@@ -248,14 +248,21 @@ def build(sample_id):
     # Column-bind results.
     logger.info('Feature shape {}'.format(features.shape))
     logger.info('Label shape {}'.format(labels.shape))
-    data = np.append(features, labels, axis=1)
+    # data = np.append(features, labels, axis=1)
 
-    # Dump to csv.
-    output = os.path.join(sample_id, sample_id + ".csv")
-
-    logger.info('Writing to CSV (this can take a minute)...')
-    with open(output, 'w') as outfile:
-        data.to_csv(outfile)
+    # Dump CSV's.
+    for fname, tbl in [
+        ('features', features),
+        ('labels', labels),
+    ]:
+        output = os.path.join(
+            sample_id, sample_id + "-{}.csv".format(fname))
+        logger.info(
+            'Writing {} to CSV (this can take a minute)...'.format(
+                fname))
+        np.savetxt(output, tbl, delimiter=',')
+    
+    logger.info('Completed succesfully.')
 
 
 # Testing code - remove before merging.
