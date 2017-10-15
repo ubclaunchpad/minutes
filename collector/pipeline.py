@@ -1,203 +1,20 @@
 import json
 import logging
 import os
-import re
 
 import numpy as np
-import pandas as pd
-import python_speech_features as psf
-from scipy.io import wavfile
-import xmltodict
+from scipy.io import wavfile as wav
+
+from extract_labels import extract_labels
+from extract_observations import extract_observations
 
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def flatten(l):
-    """Flattens a list of lists to a single list.
-
-    Args:
-        l a nested list.
-    """
-    return [item for sublist in l for item in sublist]
-
-
-def get_speakers(t, left, right, interior='[A-Za-z]+'):
-    """Returns the speakers in the string t as specified by
-    the delimiters `left' and `right'.
-
-    Args:
-        t (str): a phrase from the conversation (perhaps
-            with speakers in it).
-        left (str): a left delimiter such as '[' or ''.
-        right (str): a right delimiter such as ']' or ':'.
-        interior (str) a regex to capture the text between
-            the left and right delimiters.
-    """
-    # Prepend with slash if not empty string.
-    left_fmt = '\\' + left if left else left
-    right_fmt = '\\' + right if right else right
-
-    # There is something fancier we can do here, but this seems
-    # to be generalizing well.
-    pattern = r"{}({}){}".format(left_fmt, interior, right_fmt)
-    return re.findall(
-        pattern=pattern,
-        string=t
-    )
-
-
-def extract_labels(xml, left_delim, right_delim,
-                   interior='[A-Za-z]+', rate=44100):
-    """Given an XML transcription of a youtube conversation,
-    returns a dataframe of binary variables specifying whether
-    a speaker is speaking.
-
-    Args:
-        xml (str): xml input encoded as utf-8.
-        left_delim (str): the left delimeter on a speaker tag.
-        right_delim (str): the right delimiter on a speaker tag.
-        rate (int) represents the sample rate of the audio in Hz;
-            if you want to split the result by seconds let rate=1,
-            if you want to use the ideal sampling rate given
-            by the Nyquist Theorem, use 44100 (rather slow).
-    """
-
-    assert 0 < rate <= 44100, "rate must be on [0, 441000]"
-
-    # Format the xml into a dataframe.
-    d = xmltodict.parse(xml_input=xml)
-    df = pd.DataFrame(d['transcript']['text'])
-    df['@start'] = pd.to_numeric(df['@start'])
-    df['@dur'] = pd.to_numeric(df['@dur'])
-
-    # Build up a set of speakers.
-    speakers = set(
-        flatten([
-            get_speakers(
-                t=t,
-                left=left_delim,
-                right=right_delim,
-                interior=interior
-            ) for t in df['#text'].tolist()
-        ])
-    )
-
-    logger.info('Found speakers: {}'.format(','.join(speakers)))
-
-    assert speakers, "No speakers were found in transcription"
-
-    # Find out how many samples we'll need to generate.
-    length_sec = df.tail(1)['@start'] + df.tail(1)['@dur']
-    num_samples = int(length_sec * rate)
-
-    # Dataframe to hold results.
-    result = pd.DataFrame(
-        np.nan,
-        index=range(num_samples),
-        columns=speakers
-    )
-
-    # Each record will be used to fill some samples in result.
-    for i, record in enumerate(df.to_dict(orient='records')):
-
-        pct = int(round(100.0 * i / len(df), 2))
-        if pct % 10 == 0:
-            logger.info('{}% of texts analyzed'.format(pct))
-
-        # Find the window start and end (in samples).
-        start = int(record['@start'] * rate)
-        end = start + int(record['@dur'] * rate)
-
-        # Find out which speakers are speaking
-        # in this sample.
-        speakers_in_record = get_speakers(
-            t=record['#text'],
-            left=left_delim,
-            right=right_delim,
-            interior=interior
-        )
-
-        # See if each speaker is speaking during window.
-        if speakers_in_record:
-            for s in speakers_in_record:
-                if s in speakers:
-                    # Leave no's as nans, backfill later.
-                    # TODO: This does not split the phrase by speaker,
-                    # it just pretends "all speakers are speaking right
-                    # now." Not the best, do fix.
-                    speaking = 1 if s in speakers_in_record else np.nan
-                    result.loc[start: end, s] = speaking
-                    previous_speaker = s
-        else:
-            # Speaker is previous speaker.
-            # This breaks if there is no speaker in
-            # the first phrase. For now, let's ignore the
-            # first phrase (its normally something like
-            # [music plays]).
-            try:
-                result.loc[start:end, previous_speaker] = 1
-            except UnboundLocalError:
-                pass
-
-    # Fill the rest with 0's.
-    logger.info('Backfilling with zeros...')
-    result.fillna(0, inplace=True)
-
-    # Convert to integers.
-    logger.info('Converting to integers...')
-    for column in result.columns:
-        result[column] = result[column].astype(int)
-
-    return result
-
-
-def extract_features(audio_file, rate):
-    """Given `audio' as a numpy array, produces audio feature
-    vectors at a rate of `rate' Hz.
-
-    Note:
-        If there are n seconds of audio date, there will be
-        rate * n feature vectors.
-
-    Args:
-        audio_file (str): Filename and location of audio file.
-        rate (int): The feature extraction rate.
-
-    Returns:
-        df (pd.DataFrame): A dataframe of feature vectors.
-    """
-
-    batch_size = 2**20
-    sample_rate, signal = wavfile.read(audio_file)
-
-    # Pull features.
-    logger.info('Extracting feature vectors...')
-    start = 0
-    while start < len(signal):
-        # Create a batch (don't overflow the signal).
-        end = start + batch_size
-        end = end if end < len(signal)-1 else len(signal)
-
-        # Get features.
-        batch = signal[start:end]
-        mfcc = psf.mfcc(batch, sample_rate, winlen=1. / rate)
-        logfbank = psf.logfbank(batch, sample_rate, winlen=1. / rate)
-        ssc = psf.ssc(batch, sample_rate, winlen=1. / rate)
-
-        features = np.concatenate([mfcc, logfbank, ssc], axis=1)
-        try:
-            result = np.append(result, features, axis=0)
-        except UnboundLocalError:
-            result = features
-
-        start = end
-
-        pct = 100.0 * start / len(signal)
-        logger.info('{}% complete extracting features'.format(round(pct, 1)))
-
-    return result
+# Hyper paramters.
+SAMPLES_PER_OBSERVATION = 500
 
 
 def build(sample_id):
@@ -220,6 +37,9 @@ def build(sample_id):
     audio_file = os.path.join(sample_id, sample_id + '.wav')
     xml_file = os.path.join(sample_id, sample_id + '.xml')
 
+    # Bring in audio.
+    sample_rate, signal = wav.read(audio_file)
+
     with open(json_location, 'r') as infile:
         info = json.load(infile)
 
@@ -228,27 +48,26 @@ def build(sample_id):
     left_delim = info['left_delim']
     right_delim = info['right_delim']
     interior = info['interior']
-    rate = info['rate']
 
     # Bring in xml file and pull labels.
     with open(xml_file, 'r') as xml_infile:
         logger.info('Extracting labels...')
         labels = extract_labels(
-            xml=xml_infile.read(),
+            xml=xml_infile.read().encode('ascii'),
             left_delim=left_delim,
             right_delim=right_delim,
             interior=interior,
-            rate=rate
+            sample_rate=sample_rate,
+            samples_per_observation=SAMPLES_PER_OBSERVATION
         )
 
     # Grab features (this crashes due to memory at the moment).
     logger.info('Extracting features...')
-    features = extract_features(audio_file, rate)
+    features = extract_observations(None, None, None)
 
     # Column-bind results.
     logger.info('Feature shape {}'.format(features.shape))
     logger.info('Label shape {}'.format(labels.shape))
-    # data = np.append(features, labels, axis=1)
 
     # Dump CSV's.
     for fname, tbl in [
