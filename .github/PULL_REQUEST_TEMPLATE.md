@@ -9,4 +9,4 @@ modified by this pull request, as well as the expected result.
 
 :hourglass: **Status**: Work in Progress / Open for Visibility / Ready for Review
 
-:tickets: **Ticket(s)**: Link to tickets that
+:tickets: **Ticket(s)**: Link to tickets that this PR addresses or references.
