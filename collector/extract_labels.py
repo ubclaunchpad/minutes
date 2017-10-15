@@ -73,7 +73,7 @@ def extract_labels(xml, left_delim, right_delim,
             speakers.add(speaker)
 
     # Map speakers to integers - use OrderedDict so the output
-    # is determinant.
+    # is deterministic.
     speaker_dict = OrderedDict(
         (speaker, i)
         for i, speaker in enumerate(
@@ -99,7 +99,7 @@ def extract_labels(xml, left_delim, right_delim,
         end_obs = (start_sample+dur) // samples_per_observation
 
         # Current speaker may exist in this row or previous.
-        current = update_current_speaker(current, text, re_delim)
+        current = get_current_speaker(current, text, re_delim)
 
         # If discard, leave -1's so we can remove rows later.
         if not valid_text(text, re_delim, re_discard):
@@ -136,7 +136,7 @@ def valid_text(text, re_delim, re_discard):
     return True
 
 
-def update_current_speaker(current, text, re_delim):
+def get_current_speaker(current, text, re_delim):
     """Returns current speaker based on text, previous current speaker,
     deliminator, and discard
     """

@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-# Hyper paramters.
+# Hyper parameters.
 SAMPLES_PER_OBSERVATION = 500
 
 
 def build(sample_id):
-    """Produces a training datset from YouTube audio and
+    """Produces a training dataset from YouTube audio and
     XML transcripts.
 
     Args:
