@@ -8,7 +8,7 @@ import numpy as np
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def extract_labels(xml, left_delim, right_delim,
