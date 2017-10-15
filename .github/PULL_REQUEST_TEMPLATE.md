@@ -1,7 +1,12 @@
-:hourglass: **Status**: _Open for visibility_
-:tickets: **Ticket(s)**:
+Write a brief summary of the changes made in this pull request.
 
-## :construction_worker: Changes
+### :flashlight: Testing Instructions
 
+Describe what steps someone should follow in order to test the functionality
+modified by this pull request, as well as the expected result.
 
-## :flashlight: Testing Instructions
+----
+
+:hourglass: **Status**: Work in Progress / Open for Visibility / Ready for Review
+
+:tickets: **Ticket(s)**: Link to tickets that
