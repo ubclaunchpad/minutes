@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 
 import numpy as np
 from scipy.io import wavfile as wav
@@ -84,6 +85,8 @@ def build(sample_id):
     logger.info('Completed succesfully.')
 
 
-# Testing code - remove before merging.
 if __name__ == '__main__':
-    build('Xz3btMhdQ6Y')
+    if len(sys.argv) != 2:
+        print('Usage python3 pipeline.py [YouTube ID]')
+        sys.exit(0)
+    build(sys.argv[1])
