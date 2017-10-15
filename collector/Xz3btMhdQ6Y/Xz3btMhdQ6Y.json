@@ -2,6 +2,5 @@
     "id": "Xz3btMhdQ6Y",
     "left_delim": "[",
     "right_delim": "]",
-    "interior": "[A-Z]",
-    "rate": 4410
+    "interior": "[A-Z]"
 }
