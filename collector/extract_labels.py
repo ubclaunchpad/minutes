@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import logging
 import re
 import time
@@ -7,7 +8,7 @@ import numpy as np
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 def extract_labels(xml, left_delim, right_delim,
@@ -22,14 +23,19 @@ def extract_labels(xml, left_delim, right_delim,
     Args:
         xml_file (str): xml string to be parsed
         sample_rate (int): sample rate of audio that goes with xml_file
-        deliminator: deliminator for speaker labels.
-                    e.g. if we have "[M] Something something talking blah blah"
-                    then deliminator is a regex "\[[A-Z]\]". (match open square
-                    bracket, any single letter, close square bracket.)
-        discard: discard any lines that contain this regex (e.g., if they label
-                    sound effects in a consistant way, we can get rid of
-                    those pretty easily using this param.)
+        left_delim (str): left delimiter of speaker tag.
+        right_delim (str): right delimiter of speaker tag.
+        discard (str): discard any lines that contain this regex.
+        samples_per_observation (int): The number of samples to include
+            in each "observation" in the audio file.
+        debug (bool): whether to output helpful logging about
+            decisions made.
+
+    Returns:
+        Array of binary variables. Sometimes including a row
+        of -1 where no classification could be made.
     """
+
     # Profile time spent in function.
     start_profile = time.time()
 
@@ -65,15 +71,17 @@ def extract_labels(xml, left_delim, right_delim,
     for text in texts:
         for speaker in re_delim.findall(text):
             speakers.add(speaker)
-    logger.info('Speakers found: {}'.format(speakers))
 
-    # Map speakers to integers.
-    speaker_dict = {
-        speaker: i
+    # Map speakers to integers - use OrderedDict so the output
+    # is determinant.
+    speaker_dict = OrderedDict(
+        (speaker, i)
         for i, speaker in enumerate(
             iter(speakers)
         )
-    }
+    )
+
+    logger.info('Speakers found: {}'.format(speaker_dict))
 
     # Produce result matrix.
     labels = np.zeros((num_obs, len(speakers)), dtype=np.int32)
@@ -98,6 +106,9 @@ def extract_labels(xml, left_delim, right_delim,
             labels[start_obs:end_obs, :] = -1
         elif current:
             labels[start_obs:end_obs, speaker_dict[current]] = 1
+
+        logger.debug(text)
+        logger.debug('Result: {}'.format(labels[start_obs]))
 
     logger.info('Result shape: {}'.format(labels.shape))
     logger.info('Expected shape: ({},{})'.format(num_obs, len(speakers)))
