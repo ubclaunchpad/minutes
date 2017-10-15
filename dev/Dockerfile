@@ -2,7 +2,7 @@
 FROM minutes-prod:latest
 
 # Audio codec.
-RUN apt-get install -y libav-tools
+RUN apt-get install -y libav-tools curl
 
 # Add additional development requirements.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
@@ -13,6 +13,7 @@ RUN jupyter serverextension enable --py jupyterlab --sys-prefix
 
 # Get our jupyterlab configuration and profile in place.
 ADD dev/root/ /root/
+ADD collector/ /collector/
 
 # Exposed for development
 EXPOSE 8080

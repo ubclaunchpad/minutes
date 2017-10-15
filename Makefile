@@ -38,7 +38,9 @@ dev:
 	docker rm -f $(DEV_CONTAINER) 2>> /dev/null || true
 	docker run --rm -d \
 		--name $(DEV_IMAGE_NAME) \
+		--memory=4g \
 		-v `pwd`/nb:/nb \
+		-v `pwd`/collector:/collector \
 		-p $(DEV_PORT):$(DEV_PORT) \
 		$(DEV_IMAGE_NAME)
 

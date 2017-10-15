@@ -1,2 +1,5 @@
 nb/*
+collector/*
+!collector/*.py
+!collector/*.sh
 .DS_Store
