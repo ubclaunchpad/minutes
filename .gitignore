@@ -1,5 +1,6 @@
 nb/*
-collector/*
-!collector/*.py
-!collector/*.sh
 .DS_Store
+app/collector/*
+!app/collector/*.py
+!app/collector/*.sh
+
