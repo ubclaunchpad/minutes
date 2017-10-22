@@ -1,15 +1,12 @@
-FROM ubuntu:16.10
-MAINTAINER Chad Lagore <chad.d.lagore@gmail.com>
+FROM continuumio/miniconda3
 
 # Basic Python 3.6 setup.
 RUN apt-get update -qq
-RUN apt-get install -y python3.6 python3-pip python3-pil
-RUN apt-get install -y libpq-dev libjpeg-dev
-RUN pip3 install --upgrade pip
+RUN apt-get install -y libpq-dev libjpeg-dev curl libav-tools
 
 # Add core dependencies deps.
 ADD requirements.txt /env/requirements.txt
-RUN pip3 install -r /env/requirements.txt
+RUN pip install -r /env/requirements.txt
 
 # Dump the app in.
 ADD app/ /app/
@@ -21,5 +18,4 @@ WORKDIR /app/
 EXPOSE 80
 
 # Launch Flask app
-ENTRYPOINT [ "python3" ]
-CMD [ "main.py" ]
+CMD [ "python3", "main.py" ]
