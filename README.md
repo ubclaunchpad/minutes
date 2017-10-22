@@ -19,6 +19,7 @@ make run
 ### :rainbow: Running the Research Environment
 
 ```
+make build-dev
 make dev
 ```
 
