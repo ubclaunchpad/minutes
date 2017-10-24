@@ -19,11 +19,8 @@ def extract_observations(signal, samples_per_observation):
 
     # Truncate the signal to be some multiple of the
     # samples_per_observation.
-    mod = num_samples % samples_per_observation
-    truncated = signal[:-mod]
+    truncated = signal[:-(num_samples % samples_per_observation)]
 
-    # Reshape the signal such that we have samples_per_observations
+    # Reshape the signal such that we have samples_per_observations * 2
     # columns per row.
-    return truncated.reshape(
-        (num_samples // samples_per_observation, -1)
-    )
+    return truncated.reshape((num_samples // samples_per_observation, -1))
