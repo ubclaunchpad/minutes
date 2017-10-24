@@ -13,7 +13,6 @@ RUN jupyter serverextension enable --py jupyterlab --sys-prefix
 
 # Get our jupyterlab configuration and profile in place.
 ADD dev/root/ /root/
-ADD collector/ /collector/
 
 # Exposed for development
 EXPOSE 8080

@@ -12,13 +12,14 @@ Audio speaker diarization and transcription API.
 ### :rocket: Running the Server
 
 ```
-make
+make build-prod
 make run
 ```
 
 ### :rainbow: Running the Research Environment
 
 ```
+make build-dev
 make dev
 ```
 
