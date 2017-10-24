@@ -62,26 +62,37 @@ def build(sample_id):
             samples_per_observation=SAMPLES_PER_OBSERVATION
         )
 
-    # Grab features (this crashes due to memory at the moment).
     logger.info('Extracting features...')
-    features = extract_observations(None, None, None)
+    features = extract_observations(signal, SAMPLES_PER_OBSERVATION)
 
-    # Column-bind results.
     logger.info('Feature shape {}'.format(features.shape))
     logger.info('Label shape {}'.format(labels.shape))
 
-    # Dump CSV's.
+    # We'll truncate the results to align perfectly (lose a few samples
+    # off the end of the larger one).
+    new_len = len(features) if len(features) < len(labels) else len(labels)
+
+    logger.info('Aligning results to len {}'.format(new_len))
+    features = features[:new_len]
+    labels = labels[:new_len]
+
+    logger.info('Final feature shape {}'.format(features.shape))
+    logger.info('Final label shape {}'.format(labels.shape))
+
+    # Dump numpys.
     for fname, tbl in [
         ('features', features),
         ('labels', labels),
     ]:
         output = os.path.join(
-            sample_id, sample_id + "-{}.csv".format(fname))
+            sample_id, sample_id + "-{}".format(fname))
         logger.info(
-            'Writing {} to CSV (this can take a minute)...'.format(
+            'Writing {} to disk (this can take a minute)...'.format(
                 fname))
-        np.savetxt(output, tbl, delimiter=',')
-    
+
+        # NP disk formats https://stackoverflow.com/a/41425878
+        np.save(output, tbl)
+
     logger.info('Completed succesfully.')
 
 
