@@ -1,6 +1,5 @@
 import json
 import logging
-import pickle
 import os
 import sys
 
@@ -69,7 +68,7 @@ def build(sample_id):
     logger.info('Feature shape {}'.format(features.shape))
     logger.info('Label shape {}'.format(labels.shape))
 
-    # We'll truncate the results to align perfectly (lose a few samples 
+    # We'll truncate the results to align perfectly (lose a few samples
     # off the end of the larger one).
     new_len = len(features) if len(features) < len(labels) else len(labels)
 

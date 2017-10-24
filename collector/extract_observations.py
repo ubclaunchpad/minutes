@@ -17,7 +17,7 @@ def extract_observations(signal, samples_per_observation):
 
     num_samples = signal.shape[0]
 
-    # Truncate the signal to be some multiple of the 
+    # Truncate the signal to be some multiple of the
     # samples_per_observation.
     mod = num_samples % samples_per_observation
     truncated = signal[:-mod]
