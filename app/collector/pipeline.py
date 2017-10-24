@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 
+import requests
+import youtube_dl
 import numpy as np
 from scipy.io import wavfile as wav
 
@@ -16,6 +18,32 @@ logging.basicConfig(level=logging.INFO)
 
 # Hyper parameters.
 SAMPLES_PER_OBSERVATION = 500
+
+# Options to pass to youtube-dl
+YDL_OPTIONS = {
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'wav',
+    }],
+    'outtmpl': '%(id)s/%(id)s.%(ext)s',
+    'logger': logger,
+    'allsubtitles': True,
+    'writesubtitles': True,
+}
+
+
+def download(video_id):
+    """
+    Uses youtube-dl to download a YouTube video given its ID.
+    """
+    with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+        res = ydl.extract_info('Xz3btMhdQ6Y')
+
+        if 'requested_subtitles' not in res:
+            logger.error('Selected video has no caption track.')
+            return False
+
+        ydl.download(['https://www.youtube.com/watch?v=' + res['id']])
 
 
 def build(sample_id):
@@ -98,6 +126,10 @@ def build(sample_id):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Usage python3 pipeline.py [YouTube ID]')
+        print('Usage: python3 pipeline.py [youtube-id]')
         sys.exit(0)
-    build(sys.argv[1])
+
+    video_id = sys.argv[1]
+    download(video_id)
+    sys.exit()
+    build(video_id)
