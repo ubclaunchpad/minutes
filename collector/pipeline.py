@@ -73,8 +73,8 @@ def build(sample_id):
     new_len = len(features) if len(features) < len(labels) else len(labels)
 
     logger.info('Aligning results to len {}'.format(new_len))
-    features = features[:new_len, :]
-    labels = labels[:new_len, :]
+    features = features[:new_len]
+    labels = labels[:new_len]
 
     logger.info('Final feature shape {}'.format(features.shape))
     logger.info('Final label shape {}'.format(labels.shape))
