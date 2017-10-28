@@ -36,22 +36,20 @@ def download(video_id):
         return False
 
     if not r.text:
-        logger.info("Video `{}` has no timed transcript.".format(video_id))
-
-        if input("Download video anyways? [Y/n] ").lower() == 'n':
-            return False
+        logger.warning("Video has no timed transcript. Exiting.")
+        return False
 
     if not os.path.exists(video_id):
         os.makedirs(video_id)
         logger.info("Created directory `{}/`".format(video_id))
 
-    if r.text:
-        filename = '{0}/{0}.xml'.format(video_id)
-        with open(filename, 'w') as f:
-            f.write(r.text)
+    filename = '{0}/{0}.xml'.format(video_id)
+    with open(filename, 'w') as f:
+        f.write(r.text)
 
-        logger.info("Wrote transcript to {}.".format(filename))
+    logger.info("Wrote transcript to {}.".format(filename))
 
+    # Download the video audio
     logger.info("Attempting to download audio via youtube-dl")
 
     args = [
@@ -60,7 +58,6 @@ def download(video_id):
         video_id
     ]
 
-    # Download the video audio
     subprocess.run(args)
 
     # Prompt user for delimiter data
