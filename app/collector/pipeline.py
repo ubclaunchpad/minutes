@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
+
 import json
 import logging
 import os
 import sys
+import subprocess
 
+import requests
 import numpy as np
 from scipy.io import wavfile as wav
+from lxml import etree
 
 from extract_labels import extract_labels
 from extract_observations import extract_observations
@@ -16,6 +21,78 @@ logging.basicConfig(level=logging.INFO)
 
 # Hyper parameters.
 SAMPLES_PER_OBSERVATION = 500
+
+CAPTIONS_BASE_URL = "https://www.youtube.com/api/timedtext?lang=en&v="
+
+
+def download(video_id):
+    """
+    Downloads the transcript file for a
+    """
+    r = requests.get(CAPTIONS_BASE_URL + video_id)
+
+    if r.status_code == 404:
+        logger.warning("Invalid YouTube video ID. Exiting.")
+        return False
+
+    if not r.text:
+        logger.warning("Video has no timed transcript. Exiting.")
+        return False
+
+    if not os.path.exists(video_id):
+        os.makedirs(video_id)
+        logger.info("Created directory `{}/`".format(video_id))
+
+    filename = '{0}/{0}.xml'.format(video_id)
+    with open(filename, 'w') as f:
+        f.write(r.text)
+
+    logger.info("Wrote transcript to {}.".format(filename))
+
+    # Download the video audio
+    logger.info("Attempting to download audio via youtube-dl")
+
+    args = [
+        'youtube-dl', '--all-subs', '--extract-audio', '--audio-format=wav',
+        '--output={0}/{0}.%(ext)s'.format(video_id),
+        video_id
+    ]
+
+    subprocess.run(args)
+
+    # Prompt user for delimiter data
+    if r.text:
+        tree = etree.fromstring(r.content)
+        starts = tree.xpath("text/@start")
+        texts = [x.text.strip("\n") for x in tree.xpath("text")]
+
+        print("Here are the first few lines of the transcript:\n")
+
+        for i in range(min(7, len(texts))):
+            print(texts[i])
+
+        print()
+
+        left = input("Please input the left delimiter: ")
+        right = input("Please input the right delimiter: ")
+        interior = input("Enter interior regex (default: [A-Z]): ")
+
+        data = {
+            'id': video_id,
+            'left_delim': left or '',
+            'right_delim': right or '',
+            'interior': interior or '[A-Z]',
+        }
+
+        json_filename = '{0}/{0}.json'.format(video_id)
+
+        with open(json_filename, 'w') as f:
+            json.dump(data, f)
+
+        logger.info("Cached delimiter info to {}".format(json_filename))
+
+    return True
+
 
 
 def build(sample_id):
@@ -98,6 +175,10 @@ def build(sample_id):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Usage python3 pipeline.py [YouTube ID]')
+        print('Usage: python3 pipeline.py [youtube-id]')
         sys.exit(0)
-    build(sys.argv[1])
+
+    video_id = sys.argv[1]
+
+    if download(video_id):
+        build(video_id)
