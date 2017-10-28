@@ -84,7 +84,7 @@ def extract_labels(xml, left_delim, right_delim,
     logger.info('Speakers found: {}'.format(speaker_dict))
 
     # Produce result matrix.
-    labels = np.zeros((num_obs, len(speakers)), dtype=np.int32)
+    labels = np.zeros((num_obs, 1), dtype=np.int32)
 
     # Reference to the current speaker
     current = None
@@ -103,15 +103,15 @@ def extract_labels(xml, left_delim, right_delim,
 
         # If discard, leave -1's so we can remove rows later.
         if not valid_text(text, re_delim, re_discard):
-            labels[start_obs:end_obs, :] = -1
+            labels[start_obs:end_obs, 1] = -1 # bad data
         elif current:
-            labels[start_obs:end_obs, speaker_dict[current]] = 1
+            labels[start_obs:end_obs, 1] = speaker_dict[current] + 1  #1 to n
 
         logger.debug(text)
         logger.debug('Result: {}'.format(labels[start_obs]))
 
     logger.info('Result shape: {}'.format(labels.shape))
-    logger.info('Expected shape: ({},{})'.format(num_obs, len(speakers)))
+    logger.info('Expected shape: ({},{})'.format(num_obs, 1))
     logger.info('Time spent: {}'.format(time.time() - start_profile))
 
     return labels
