@@ -41,9 +41,9 @@ You will need to set `DOCKER_USERNAME` and `DOCKER_PASSWORD` and be a member of 
 We have a pipeline that is designed to take YouTube videos with
 transcripts and convert them into training data. `pipeline.py`
 is a CLI that will attempt to download the transcript and audio
-data for a given video, as well as prompt for transcript delimiter
-information that the rest of the pipeline uses to create labelled
-data.
+data for a given video, as well as prompt for some information
+that the rest of the pipeline uses to create labelled data
+(ie. what delimeters are used to identify speakers).
 
 ```bash
 $ cd app/collector
