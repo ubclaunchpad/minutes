@@ -1,10 +1,12 @@
 def extract_observations(signal, samples_per_observation):
     """Converts signal into a table of observations for training data.
+
     Args:
         signal (np.ndarray): An Nx2 array of raw audio data.
         samples_per_observation (int): A hyperparamter; the
             number of audio samples to place into each observation
             (row).
+
     Returns:
         np.ndarray: An array with num_samples / samples_per_observation
             rows and 2 * samples_per_observation columns (there are
