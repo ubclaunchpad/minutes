@@ -79,8 +79,8 @@ def download(video_id):
 
         data = {
             'id': video_id,
-            'left_delim': left or None,
-            'right_delim': right or None,
+            'left_delim': left or '',
+            'right_delim': right or '',
             'interior': interior or '[A-Z]',
         }
 
