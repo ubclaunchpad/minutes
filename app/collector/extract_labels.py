@@ -103,9 +103,9 @@ def extract_labels(xml, left_delim, right_delim,
 
         # If discard, leave -1's so we can remove rows later.
         if not valid_text(text, re_delim, re_discard):
-            labels[start_obs:end_obs, 1] = -1 # bad data
+            labels[start_obs:end_obs] = -1 # bad data
         elif current:
-            labels[start_obs:end_obs, 1] = speaker_dict[current] + 1  #1 to n
+            labels[start_obs:end_obs] = speaker_dict[current] + 1  #1 to n
 
         logger.debug(text)
         logger.debug('Result: {}'.format(labels[start_obs]))
