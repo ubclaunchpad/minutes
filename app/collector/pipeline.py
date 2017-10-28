@@ -1,12 +1,15 @@
+#!/usr/bin/env python3
+
 import json
 import logging
 import os
 import sys
+import subprocess
 
 import requests
-import youtube_dl
 import numpy as np
 from scipy.io import wavfile as wav
+from lxml import etree
 
 from extract_labels import extract_labels
 from extract_observations import extract_observations
@@ -19,31 +22,80 @@ logging.basicConfig(level=logging.INFO)
 # Hyper parameters.
 SAMPLES_PER_OBSERVATION = 500
 
-# Options to pass to youtube-dl
-YDL_OPTIONS = {
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'wav',
-    }],
-    'outtmpl': '%(id)s/%(id)s.%(ext)s',
-    'logger': logger,
-    'allsubtitles': True,
-    'writesubtitles': True,
-}
+CAPTIONS_BASE_URL = "https://www.youtube.com/api/timedtext?lang=en&v="
 
 
 def download(video_id):
     """
-    Uses youtube-dl to download a YouTube video given its ID.
+    Downloads the transcript file for a
     """
-    with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-        res = ydl.extract_info('Xz3btMhdQ6Y')
+    r = requests.get(CAPTIONS_BASE_URL + video_id)
 
-        if 'requested_subtitles' not in res:
-            logger.error('Selected video has no caption track.')
+    if r.status_code == 404:
+        logger.warning("Invalid YouTube video ID. Exiting.")
+        return False
+
+    if not r.text:
+        logger.info("Video `{}` has no timed transcript.".format(video_id))
+
+        if input("Download video anyways? [Y/n] ").lower() == 'n':
             return False
 
-        ydl.download(['https://www.youtube.com/watch?v=' + res['id']])
+    if not os.path.exists(video_id):
+        os.makedirs(video_id)
+        logger.info("Created directory `{}/`".format(video_id))
+
+    if r.text:
+        filename = '{0}/{0}.xml'.format(video_id)
+        with open(filename, 'w') as f:
+            f.write(r.text)
+
+        logger.info("Wrote transcript to {}.".format(filename))
+
+    logger.info("Attempting to download audio via youtube-dl")
+
+    args = [
+        'youtube-dl', '--all-subs', '--extract-audio', '--audio-format=wav',
+        '--output={0}/{0}.%(ext)s'.format(video_id),
+        video_id
+    ]
+
+    # Download the video audio
+    subprocess.run(args)
+
+    # Prompt user for delimiter data
+    if r.text:
+        tree = etree.fromstring(r.content)
+        starts = tree.xpath("text/@start")
+        texts = [x.text.strip("\n") for x in tree.xpath("text")]
+
+        print("Here are the first few lines of the transcript:\n")
+
+        for i in range(min(7, len(texts))):
+            print(texts[i])
+
+        print()
+
+        left = input("Please input the left delimiter: ")
+        right = input("Please input the right delimiter: ")
+        interior = input("Enter interior regex (default: [A-Z]): ")
+
+        data = {
+            'id': video_id,
+            'left_delim': left or None,
+            'right_delim': right or None,
+            'interior': interior or '[A-Z]',
+        }
+
+        json_filename = '{0}/{0}.json'.format(video_id)
+
+        with open(json_filename, 'w') as f:
+            json.dump(data, f)
+
+        logger.info("Cached delimiter info to {}".format(json_filename))
+
+    return True
+
 
 
 def build(sample_id):
@@ -130,6 +182,6 @@ if __name__ == '__main__':
         sys.exit(0)
 
     video_id = sys.argv[1]
-    download(video_id)
-    sys.exit()
-    build(video_id)
+
+    if download(video_id):
+        build(video_id)
