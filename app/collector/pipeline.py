@@ -13,6 +13,7 @@ from lxml import etree
 
 from extract_labels import extract_labels
 from extract_observations import extract_observations
+from extract_features import extract_features
 
 
 logger = logging.getLogger(__name__)
@@ -139,20 +140,24 @@ def build(sample_id):
             samples_per_observation=SAMPLES_PER_OBSERVATION
         )
 
-    logger.info('Extracting features...')
-    features = extract_observations(signal, SAMPLES_PER_OBSERVATION)
+    logger.info('Extracting obs...')
+    obs = extract_observations(signal, SAMPLES_PER_OBSERVATION)
 
-    logger.info('Feature shape {}'.format(features.shape))
+    logger.info('Observation shape {}'.format(obs.shape))
     logger.info('Label shape {}'.format(labels.shape))
 
     # We'll truncate the results to align perfectly (lose a few samples
     # off the end of the larger one).
-    new_len = len(features) if len(features) < len(labels) else len(labels)
+    new_len = len(obs) if len(obs) < len(obs) else len(obs)
 
     logger.info('Aligning results to len {}'.format(new_len))
-    features = features[:new_len]
+    obs = obs[:new_len]
     labels = labels[:new_len]
 
+    logger.info('Extracting obs...')
+    features = extract_features(obs, sample_rate)
+
+    logger.info('Final observation shape {}'.format(obs.shape))
     logger.info('Final feature shape {}'.format(features.shape))
     logger.info('Final label shape {}'.format(labels.shape))
 
