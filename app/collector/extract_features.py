@@ -7,14 +7,14 @@ def extract_features(observations, sample_rate):
        sample_rate: sample rate
        Each row of output is converted to features from `observations` using `python_speech_features`.
     """   
-    # make features array 
-    # TODO: fix placeholder for width
-    # width = 26 # number of columns of output array, calculated based on what features python_speech_features gives
-    # features = np.zeros(observations.shape[0], width) 
-    # convert rows to features 
-
-    return np.apply_along_axis(lambda x : mfcc(x, sample_rate)[0], 1, observations)
-    # for i in range(observations.shape[0]):
-    #    features[i, :] = mfcc(observations[i, :], sample_rate)
-    # return features array
-    # return features
+    # TODO: add comment to indicate which part of output are which features
+    return np.apply_along_axis(\
+         lambda x : \
+            np.concatenate(\
+                  (np.ndarray.flatten(mfcc(x, sample_rate)), \
+                   np.ndarray.flatten(fbank(x, sample_rate)), \
+                   np.ndarray.flatten(logfbank(x, sample_rate)), \
+                   np.ndarray.flatten(ssc(x, sample_rate))),
+                  axis=1), \
+         1, \
+         observations)
