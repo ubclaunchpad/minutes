@@ -13,7 +13,7 @@ def extract_features(observations, sample_rate):
     # features = np.zeros(observations.shape[0], width) 
     # convert rows to features 
 
-    return np.apply_along_axis(lambda x : mfcc(x, sample_rate), 1, observations)
+    return np.apply_along_axis(lambda x : mfcc(x, sample_rate)[0], 1, observations)
     # for i in range(observations.shape[0]):
     #    features[i, :] = mfcc(observations[i, :], sample_rate)
     # return features array
