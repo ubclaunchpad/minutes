@@ -1,5 +1,7 @@
 from python_speech_features import mfcc
+from python_speech_features import fbank
 from python_speech_features import logfbank
+from python_speech_features import ssc
 import numpy as np
 
 def extract_features(observations, sample_rate):
