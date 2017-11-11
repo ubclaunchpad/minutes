@@ -6,5 +6,6 @@ def extract_features(observations):
        Output: array of features. 
        Each row of observations is converted to features using `python_speech_features`.
     """   
-    # convert rows to features in place
-    return observations
+    # make features array 
+    # convert rows to features 
+    # return features array
