@@ -163,7 +163,7 @@ def build(sample_id):
 
     # Dump numpys.
     for fname, tbl in [
-        ('observations', observations),
+        ('observations', obs),
         ('labels', labels),
         ('features', features)
     ]:
