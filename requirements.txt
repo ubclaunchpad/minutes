@@ -3,6 +3,7 @@ lxml==4.1.0
 numpy==1.13.3
 scipy==0.19.1
 requests==2.18.4
+python_speech_features
 
 # Use the latest version of youtube-dl
 youtube-dl
