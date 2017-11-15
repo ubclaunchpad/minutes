@@ -154,7 +154,7 @@ def build(sample_id):
     obs = obs[:new_len]
     labels = labels[:new_len]
 
-    logger.info('Extracting obs...')
+    logger.info('Extracting features (this will take a while)...')
     features = extract_features(obs, sample_rate)
 
     logger.info('Final observation shape {}'.format(obs.shape))
@@ -163,8 +163,9 @@ def build(sample_id):
 
     # Dump numpys.
     for fname, tbl in [
-        ('features', features),
+        ('observations', observations),
         ('labels', labels),
+        ('features', features)
     ]:
         output = os.path.join(
             sample_id, sample_id + "-{}".format(fname))
