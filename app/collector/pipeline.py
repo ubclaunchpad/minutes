@@ -148,7 +148,7 @@ def build(sample_id):
 
     # We'll truncate the results to align perfectly (lose a few samples
     # off the end of the larger one).
-    new_len = len(obs) if len(obs) < len(obs) else len(obs)
+    new_len = len(obs) if len(obs) < len(labels) else len(labels)
 
     logger.info('Aligning results to len {}'.format(new_len))
     obs = obs[:new_len]
