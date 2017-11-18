@@ -86,9 +86,9 @@ class GBM(Model):
             logger.info('Training score: {}'.format(
                 round(100 * fit.score(X_test, y_test), 2)))
 
-    def predict(self, y):
+    def predict(self, X):
         try:
-            return self.model.predict(y)
+            return self.model.predict(X)
         except NotFittedError as e:
             logger.error('Model not yet fitted, call model.train to fit')
             raise e
