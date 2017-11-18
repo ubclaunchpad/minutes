@@ -84,11 +84,13 @@ class GBM(Model):
 
         if y_test.size > 0:    
             logger.info('Training score: {}'.format(
-                round(100 * self.fit.score(X_test, y_test), 2)))
+                round(100 * fit.score(X_test, y_test), 2)))
 
-    def predict(self, X):
+    def predict(self, y):
         try:
-            return self.model.predict(X)
+            return self.model.predict(y)
         except NotFittedError as e:
             logger.error('Model not yet fitted, call model.train to fit')
             raise e
+
+    
