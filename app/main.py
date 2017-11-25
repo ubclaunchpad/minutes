@@ -140,7 +140,7 @@ def process_labels(directory, sample_id):
             sample_rate)
 
     logger.info("Truncating for demo :(")
-    labels = labels[OBSERVATION_START:OBSERVATION_LIMIT]
+    labels = labels[:OBSERVATION_LIMIT]
     logger.info("Label shape {}".format(labels.shape))
 
     logger.info("Writing to disk")
@@ -166,7 +166,7 @@ def process_audio(directory, sample_id):
     observations = extract_observations(signal, SAMPLES_PER_OBSERVATION)
     logger.info("Observation shape {}".format(observations.shape))
 
-    observations = observations[OBSERVATION_START:OBSERVATION_LIMIT]
+    observations = observations[:OBSERVATION_LIMIT]
     logger.info("Observation truncated for demo {}".format(observations.shape))
 
     logger.info("Collecting features")
