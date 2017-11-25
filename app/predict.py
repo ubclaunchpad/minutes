@@ -50,14 +50,11 @@ class Model:
 
 
 class GBM(Model):
-    """Builds a GradientBoostedClassifier.
-    """
+    """Builds a GradientBoostedClassifier."""
     model = GradientBoostingClassifier(
         verbose=1,
         warm_start=True
     )
-
-    accuracy = 0
 
     def train(self, X, y, **kwargs):
         # Drop "I dont know's".

@@ -194,8 +194,6 @@ def train_model(directory, sample_id):
     model = GBM()
     model.train(X, y)
 
-    return model.accuracy
-
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port='80')
