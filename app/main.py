@@ -105,7 +105,7 @@ async def upload_labels(request, sample_id):
     })
 
 
-@app.route("/upload/train/<sample_id>", methods=['POST'])
+@app.route("/upload/train/<sample_id>", methods=['GET'])
 async def train(request, sample_id):
     """
     Upload and process xml labels for sample
