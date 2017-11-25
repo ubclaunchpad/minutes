@@ -50,8 +50,7 @@ class Model:
 
 
 class GBM(Model):
-    """Builds a GradientBoostedClassifier.
-    """
+    """Builds a GradientBoostedClassifier."""
     model = GradientBoostingClassifier(
         verbose=1,
         warm_start=True
@@ -82,9 +81,10 @@ class GBM(Model):
 
         fit = self.model.fit(X_train, y_train)
 
-        if y_test.size > 0:    
+        if y_test.size > 0:
+            self.accuracy = fit.score(X_test, y_test)
             logger.info('Training score: {}'.format(
-                round(100 * fit.score(X_test, y_test), 2)))
+                round(100 * self.accuracy, 2)))
 
     def predict(self, X):
         try:

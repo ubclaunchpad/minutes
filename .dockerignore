@@ -2,3 +2,5 @@ venv
 nb
 model
 collector
+*.wav
+*.npy
