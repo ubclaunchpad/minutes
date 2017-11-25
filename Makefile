@@ -31,6 +31,7 @@ run:
 	docker run -it \
 		--name $(PROD_IMAGE_NAME) \
 		-p $(PROD_PORT):$(PROD_PORT) \
+		-v `pwd`/app:/app/app \
 		$(PROD_IMAGE_NAME)
 
 dev:

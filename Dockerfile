@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM python:3.6-stretch
 
 # Basic Python 3.6 setup.
 RUN apt-get update -qq
@@ -14,8 +14,17 @@ ADD app/ /app/
 # Head to the working directory.
 WORKDIR /app/
 
+# To hold temp data from api.
+RUN mkdir /data
+
 # Expose for production.
 EXPOSE 80
 
 # Launch Flask app
-CMD [ "python3", "main.py" ]
+CMD gunicorn \
+    --reload \
+    --bind 0.0.0.0:80 \
+    --workers 2 \
+    --timeout 3600 \
+    --worker-class sanic_gunicorn.Worker \
+    'app.main:app()'

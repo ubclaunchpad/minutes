@@ -57,6 +57,8 @@ class GBM(Model):
         warm_start=True
     )
 
+    accuracy = 0
+
     def train(self, X, y, **kwargs):
         # Drop "I dont know's".
         drops = [i for i, x in enumerate(y) if x == -1]
@@ -82,9 +84,10 @@ class GBM(Model):
 
         fit = self.model.fit(X_train, y_train)
 
-        if y_test.size > 0:    
+        if y_test.size > 0:
+            self.accuracy = fit.score(X_test, y_test)
             logger.info('Training score: {}'.format(
-                round(100 * fit.score(X_test, y_test), 2)))
+                round(100 * self.accuracy, 2))
 
     def predict(self, X):
         try:
