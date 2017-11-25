@@ -84,7 +84,7 @@ class GBM(Model):
         if y_test.size > 0:
             self.accuracy = fit.score(X_test, y_test)
             logger.info('Training score: {}'.format(
-                round(100 * self.accuracy, 2))
+                round(100 * self.accuracy, 2)))
 
     def predict(self, X):
         try:

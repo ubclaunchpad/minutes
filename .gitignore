@@ -3,4 +3,4 @@ nb/*
 app/collector/*
 !app/collector/*.py
 !app/collector/*.sh
-
+*.pyc
