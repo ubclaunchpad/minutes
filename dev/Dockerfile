@@ -2,7 +2,7 @@
 FROM minutes-prod:latest
 
 # Audio codec.
-RUN apt-get install -y libav-tools curl python-dev
+RUN apt-get update && apt-get install -y libav-tools curl python-dev
 
 # Add additional development requirements.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
