@@ -6,12 +6,13 @@ import h5py
 
 class TrainingData:
 
-    def __init__(self, mode):
+    def __init__(self, file_loc, mode):
         self.mode = mode
+        self.file_loc = file_loc
 
-    def __enter__(self, file_loc):
+    def __enter__(self):
         """Open an HDF5 file"""
-        self.f = h5py.File(file_loc, self.mode)
+        self.f = h5py.File(self.file_loc, self.mode)
 
         # Check if datasets exist:
         if not self.f.items():
@@ -57,7 +58,7 @@ class TrainingData:
             batch of labels (batch_size, 1).
         """
         random.seed(random_state)
-        idx = range(self.X_ds.shape[0])
+        idx = list(range(self.X_ds.shape[0]))
         random.shuffle(idx)
 
         for chunk in (idx[pos:pos + batch_size] for pos in range(
