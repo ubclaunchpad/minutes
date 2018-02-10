@@ -6,7 +6,11 @@ python_speech_features==0.6
 xmltodict==0.11.0
 pydub==0.20.0
 requests==2.18.4
-youtube-dl==2017.10.1
+soundfile
+keras
+tensorflow
+numpy==1.14.0
+h5py
 
 # Unpinned, we want to use latest updates.
 jupyterlab
