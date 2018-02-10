@@ -6,14 +6,12 @@ import h5py
 
 class TrainingData:
 
-    dataset_name = 'training'
-
     def __init__(self, mode):
         self.mode = mode
 
-    def __enter__(self):
+    def __enter__(self, file_loc):
         """Open an HDF5 file"""
-        self.f = h5py.File(HDF5_FILE, self.mode)
+        self.f = h5py.File(file_loc, self.mode)
 
         # Check if datasets exist:
         if not self.f.items():
