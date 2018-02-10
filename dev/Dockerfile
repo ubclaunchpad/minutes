@@ -2,14 +2,19 @@
 FROM minutes-prod:latest
 
 # Audio codec.
-RUN apt-get install -y libav-tools curl
+RUN apt-get update && apt-get install -y libav-tools curl python-dev
 
 # Add additional development requirements.
 ADD ./dev/requirements.txt /env/requirements-dev.txt
 RUN pip install -r /env/requirements-dev.txt
 
+# Additional things we install with conda.
+RUN conda install psutil nodejs
+RUN conda install -c cpcloud npm
+
 # Development settings.
 RUN jupyter serverextension enable --py jupyterlab --sys-prefix
+RUN jupyter labextension install @jupyterlab/google-drive
 
 # Get our jupyterlab configuration and profile in place.
 ADD dev/root/ /root/
