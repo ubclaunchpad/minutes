@@ -1,17 +1,7 @@
-from itertools import izip_longest
 import random
-import os
-import glob
 
 import numpy as np
 import h5py
-
-ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-TRANSFER_DIR = os.path.join(ROOT_DIR, 'transfer')
-DATA_DIR = os.path.join(TRANSFER_DIR, 'data')
-BASE_DIR = os.path.join(DATA_DIR, 'base')
-PROCESSED_DIR = os.path.join(BASE_DIR, 'processed')
-HDF5_FILE = os.path.join(PROCESSED_DIR, 'train.hdf5')
 
 
 class TrainingData:
@@ -24,15 +14,22 @@ class TrainingData:
     def __enter__(self):
         """Open an HDF5 file"""
         self.f = h5py.File(HDF5_FILE, self.mode)
-        self.X_ds = self.f.require_dataset(
-            "X", (0, 1025, 32, 3),
-            maxshape=(None, 1025, 32, 3), dtype='f'
-        )
-        self.y_ds = self.f.require_dataset(
-            "y", (0, 1),
-            maxshape=(None, 1),
-            dtype='i'
-        )
+
+        # Check if datasets exist:
+        if not self.f.items():
+            self.X_ds = self.f.require_dataset(
+                "X", (0, 1025, 32, 3),
+                maxshape=(None, 1025, 32, 3), dtype='f'
+            )
+            self.y_ds = self.f.require_dataset(
+                "y", (0, 1),
+                maxshape=(None, 1),
+                dtype='i'
+            )
+        else:
+            self.X_ds = self.f["X"]
+            self.y_ds = self.f["y"]
+
         return self
 
     def __exit__(self, type, value, traceback):
@@ -43,16 +40,11 @@ class TrainingData:
 
         Args:
             X (np.array): Shape (N, h, w, c) (writes to X partition).
+            y (np.array): Shape (N, 1) (writes to y partition).
         """
-        self.X_ds.resize(
-            (self.X_ds.shape[0] + X.shape[0]),
-            axis = 0
-        )
 
-        self.y_ds.resize(
-            (self.y_ds.shape[0] + y.shape[0]),
-            axis = 0
-        )
+        self.X_ds.resize((self.X_ds.shape[0] + X.shape[0]), axis=0)
+        self.y_ds.resize((self.y_ds.shape[0] + y.shape[0]), axis=0)
 
         self.X_ds[-X.shape[0]:] = X
         self.y_ds[-y.shape[0]:] = y
@@ -72,5 +64,8 @@ class TrainingData:
 
         for chunk in (idx[pos:pos + batch_size] for pos in range(
                 0, len(idx), batch_size)
-            ):
-            yield np.take(self.X_ds, chunk), np.take(self.y_ds, chunk)
+                ):
+            yield (
+                np.take(self.X_ds, chunk, axis=0),
+                np.take(self.y_ds, chunk, axis=0)
+            )
