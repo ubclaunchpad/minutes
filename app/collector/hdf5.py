@@ -62,9 +62,5 @@ class TrainingData:
         random.shuffle(idx)
 
         for chunk in (idx[pos:pos + batch_size] for pos in range(
-                0, len(idx), batch_size)
-                ):
-            yield (
-                np.take(self.X_ds, chunk, axis=0),
-                np.take(self.y_ds, chunk, axis=0)
-            )
+                0, len(idx), batch_size)):
+            yield self.X_ds[sorted(chunk)], self.y_ds[sorted(chunk)]
