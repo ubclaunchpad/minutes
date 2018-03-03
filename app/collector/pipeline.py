@@ -9,7 +9,11 @@ import subprocess
 import requests
 import numpy as np
 from scipy.io import wavfile as wav
+from sklearn import preprocessing
 from lxml import etree
+import librosa
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 from extract_labels import extract_labels
 from extract_observations import extract_observations
@@ -21,7 +25,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 # Hyper parameters.
-SAMPLES_PER_OBSERVATION = 500
+# Creates 32 width spectrograms to match librivox.
+SAMPLES_PER_OBSERVATION = 48000 // 6
 
 CAPTIONS_BASE_URL = "https://www.youtube.com/api/timedtext?lang=en&v="
 
@@ -95,7 +100,6 @@ def download(video_id):
     return True
 
 
-
 def build(sample_id):
     """Produces a training dataset from YouTube audio and
     XML transcripts.
@@ -108,7 +112,6 @@ def build(sample_id):
                 2) A wave file named sample_id.wav
                 3) A json file named sample_id.json
     """
-
     logger.info('Working on id {}'.format(sample_id))
 
     # Get parameters from results folder.
@@ -176,7 +179,53 @@ def build(sample_id):
         # NP disk formats https://stackoverflow.com/a/41425878
         np.save(output, tbl)
 
+    build_spectrograms(video_id)
     logger.info('Completed succesfully.')
+
+
+def get_spectrograms(rows, output_file):
+    """Converts a 2D table of rows into one spectrogram per row.
+
+    Args:
+        (rows): A table of audio data.
+    """
+    min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 1))
+
+    # Choose a colormap.
+    convert = plt.get_cmap(cm.jet)
+    imgs = np.zeros((rows.shape[0], 1025, 32, 3))
+
+    for i in range(0, rows.shape[0]):
+        sys.stdout.write("Progress: %d%%   \r" % (100 * i / rows.shape[0]))
+        sys.stdout.flush()
+        X = librosa.stft(rows[i].astype(float))
+        Xdb = librosa.amplitude_to_db(X)
+        Xdb = min_max_scaler.fit_transform(Xdb)
+        numpy_output_static = convert(Xdb)[:, :, :3]
+
+        # Spectrograms are upside down, flip them.
+        numpy_output_static = np.flip(numpy_output_static, 0)
+        imgs[i] = numpy_output_static
+
+    np.save(output_file, imgs)
+    return imgs
+
+
+def build_spectrograms(video_id):
+    """Builds spectrograms from an audio file and outputs them
+    to a folder.
+
+    Args:
+        video_id (str): The id of the YouTube video.
+    """
+    logger.info('Building spectrograms for {}'.format(video_id))
+    audio_file = os.path.join(video_id, video_id + '.wav')
+    output_file = os.path.join(video_id, video_id + '-spectrograms.npy')
+    sample_rate, signal = wav.read(audio_file)
+
+    observations = extract_observations(signal, SAMPLES_PER_OBSERVATION)
+    imgs = get_spectrograms(observations, output_file)
+    logger.info("Spectrogram result shape: {}".format(imgs.shape))
 
 
 if __name__ == '__main__':
@@ -187,4 +236,5 @@ if __name__ == '__main__':
     video_id = sys.argv[1]
 
     if download(video_id):
+        build_spectrograms(video_id)
         build(video_id)
