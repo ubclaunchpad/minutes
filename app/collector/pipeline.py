@@ -30,6 +30,15 @@ SAMPLES_PER_OBSERVATION = 48000 // 6
 
 CAPTIONS_BASE_URL = "https://www.youtube.com/api/timedtext?lang=en&v="
 
+# Spectrogram shape dictated by librivox dataset.
+SPECTROGRAM_SHAPE = (1025, 32, 3)
+
+# Directory structure.
+AUDIO_FILE_LOC = lambda x: os.path.join(x, x + '.wav')
+JSON_FILE_LOC = lambda x: os.path.join(x, x + '.json')
+XML_FILE_LOC = lambda x: os.path.join(x, x + '.xml')
+SPECTROGRAM_FILE_LOC = lambda x: os.path.join(x, x + '-spectrograms.npy')
+
 
 def download(video_id):
     """
@@ -49,8 +58,7 @@ def download(video_id):
         os.makedirs(video_id)
         logger.info("Created directory `{}/`".format(video_id))
 
-    filename = '{0}/{0}.xml'.format(video_id)
-    with open(filename, 'w') as f:
+    with open(XML_FILE_LOC(video_id), 'w') as f:
         f.write(r.text)
 
     logger.info("Wrote transcript to {}.".format(filename))
@@ -90,12 +98,11 @@ def download(video_id):
             'interior': interior or '[A-Z]',
         }
 
-        json_filename = '{0}/{0}.json'.format(video_id)
-
-        with open(json_filename, 'w') as f:
+        with open(JSON_FILE_LOC(video_id), 'w') as f:
             json.dump(data, f)
 
-        logger.info("Cached delimiter info to {}".format(json_filename))
+        logger.info("Cached delimiter info to {}".format(
+            JSON_FILE_LOC(video_id)))
 
     return True
 
@@ -114,15 +121,10 @@ def build(sample_id):
     """
     logger.info('Working on id {}'.format(sample_id))
 
-    # Get parameters from results folder.
-    json_location = os.path.join(sample_id, sample_id + '.json')
-    audio_file = os.path.join(sample_id, sample_id + '.wav')
-    xml_file = os.path.join(sample_id, sample_id + '.xml')
-
     # Bring in audio.
-    sample_rate, signal = wav.read(audio_file)
+    sample_rate, signal = wav.read(AUDIO_FILE_LOC(sample_id))
 
-    with open(json_location, 'r') as infile:
+    with open(JSON_FILE_LOC(video_id), 'r') as infile:
         info = json.load(infile)
 
     logger.info('Using parameters {}'.format(info))
@@ -132,7 +134,7 @@ def build(sample_id):
     interior = info['interior']
 
     # Bring in xml file and pull labels.
-    with open(xml_file, 'r') as xml_infile:
+    with open(XML_FILE_LOC(video_id), 'r') as xml_infile:
         logger.info('Extracting labels...')
         labels = extract_labels(
             xml=xml_infile.read().encode('ascii'),
@@ -193,7 +195,7 @@ def get_spectrograms(rows, output_file):
 
     # Choose a colormap.
     convert = plt.get_cmap(cm.jet)
-    imgs = np.zeros((rows.shape[0], 1025, 32, 3))
+    imgs = np.zeros((rows.shape[0], *SPECTROGRAM_SHAPE))
 
     for i in range(0, rows.shape[0]):
         sys.stdout.write("Progress: %d%%   \r" % (100 * i / rows.shape[0]))
@@ -219,12 +221,9 @@ def build_spectrograms(video_id):
         video_id (str): The id of the YouTube video.
     """
     logger.info('Building spectrograms for {}'.format(video_id))
-    audio_file = os.path.join(video_id, video_id + '.wav')
-    output_file = os.path.join(video_id, video_id + '-spectrograms.npy')
-    sample_rate, signal = wav.read(audio_file)
-
+    sample_rate, signal = wav.read(AUDIO_FILE_LOC(video_id))
     observations = extract_observations(signal, SAMPLES_PER_OBSERVATION)
-    imgs = get_spectrograms(observations, output_file)
+    imgs = get_spectrograms(observations, SPECTROGRAM_FILE_LOC(video_id))
     logger.info("Spectrogram result shape: {}".format(imgs.shape))
 
 
@@ -235,6 +234,5 @@ if __name__ == '__main__':
 
     video_id = sys.argv[1]
 
-    if download(video_id):
-        build_spectrograms(video_id)
+    if os.path.isfile(AUDIO_FILE_LOC(video_id)) or download(video_id):
         build(video_id)
