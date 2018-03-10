@@ -8,12 +8,27 @@ Audio speaker diarization and transcription API.
 
 ## :running: Getting Started
 
+To use our [conda](https://conda.io/docs/user-guide/install/index.html) environment,
+
+```bash
+conda env create -f environment.yml
+source activate minutes
+```
 
 ### :rocket: Running the Server
+
+To run the server in the docker container, run:
 
 ```
 make build-prod
 make run
+```
+
+To run it using conda, run:
+
+```
+source activate minutes
+python app/main.py
 ```
 
 ### :rainbow: Running the Research Environment
