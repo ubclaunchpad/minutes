@@ -2,3 +2,6 @@ venv
 nb
 model
 collector
+**/*.npy
+**/*.hdf5
+**/*.xml

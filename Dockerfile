@@ -1,12 +1,17 @@
 FROM continuumio/miniconda3
 
-# Basic Python 3.6 setup.
+RUN conda update -n base conda
+ADD environment.yml /tmp/environment.yml
+RUN conda env create -f /tmp/environment.yml
+
+# Make sure the environment is always running inside the container.
+RUN echo "source activate minutes" > ~/.bashrc
+ENV PATH /opt/conda/envs/minutes/bin:$PATH
+ENV KERAS_BACKEND tensorflow
+
+# OS setup
 RUN apt-get update -qq
 RUN apt-get install -y libpq-dev libjpeg-dev curl libav-tools
-
-# Add core dependencies deps.
-ADD requirements.txt /env/requirements.txt
-RUN pip install -r /env/requirements.txt
 
 # Dump the app in.
 ADD app/ /app/
@@ -15,7 +20,7 @@ ADD app/ /app/
 WORKDIR /app/
 
 # Expose for production.
-EXPOSE 80
+EXPOSE 8081
 
 # Launch Flask app
-CMD [ "python3", "main.py" ]
+CMD python main.py
