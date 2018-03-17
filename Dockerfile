@@ -7,6 +7,7 @@ RUN conda env create -f /tmp/environment.yml
 # Make sure the environment is always running inside the container.
 RUN echo "source activate minutes" > ~/.bashrc
 ENV PATH /opt/conda/envs/minutes/bin:$PATH
+ENV KERAS_BACKEND tensorflow
 
 # OS setup
 RUN apt-get update -qq
