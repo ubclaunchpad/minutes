@@ -19,10 +19,15 @@ def load_data(features_file_name, labels_file_name, initial_index=0):
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, random_state=42)
     return (X_train, y_train), (X_test, y_test)
 
+def load_hdf5_data(x_data, y_data):
+    y_data = to_categorical(y_data, 50)
+    return train_test_split(x_data, y_data, test_size=0.20, random_state=42)
+    
 # Train
 # =====
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
+from keras.utils import HDF5Matrix
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 
 # (Making sure) Set backend as tensorflow
@@ -30,7 +35,10 @@ from keras import backend as K
 
 K.set_image_dim_ordering('tf')
 
-(X_train, y_train), (X_test, y_test) = load_data("chunk_100_features.npy", "chunk_100_labels.npy")
+x_data = HDF5Matrix('train.hdf5', 'X')
+y_data = HDF5Matrix('train.hdf5', 'y')
+#(X_train, y_train), (X_test, y_test) = load_data("chunk_100_features.npy", "chunk_100_labels.npy")
+X_train, y_train, X_test, y_test = load_hdf5_data(x_data, y_data)
 
 # Sequential Model
 model = Sequential()
@@ -67,7 +75,7 @@ print(model.output_shape) # (None, 5)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Training
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=15, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=15, batch_size=200, verbose=1, shuffle="batch")
 
 # Print model summary
 print(model.summary())
