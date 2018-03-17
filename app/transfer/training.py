@@ -21,7 +21,7 @@ def load_data(features_file_name, labels_file_name, initial_index=0):
 
 def load_hdf5_data(x_data, y_data):
     y_data = to_categorical(y_data, 50)
-    return train_test_split(features, labels, test_size=0.20, random_state=42)
+    return train_test_split(x_data, y_data, test_size=0.20, random_state=42)
     
 # Train
 # =====
