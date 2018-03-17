@@ -61,7 +61,7 @@ def download(video_id):
     with open(XML_FILE_LOC(video_id), 'w') as f:
         f.write(r.text)
 
-    logger.info("Wrote transcript to {}.".format(filename))
+    logger.info("Wrote transcript to {}.".format(XML_FILE_LOC(video_id)))
 
     # Download the video audio
     logger.info("Attempting to download audio via youtube-dl")
