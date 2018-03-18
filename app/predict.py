@@ -114,7 +114,6 @@ class TransferCNN(Model):
         """Trains the model using transfer learning (starts from the base model,
         and adds a dense layer given new data).
         """
-        # Drop "I dont know's".
         X, y = filter_i_dont_knows(X, y)
 
         k = len(np.unique(y))
@@ -124,15 +123,18 @@ class TransferCNN(Model):
         for k in self.model.layers[:-1]:
             k.trainable = False
 
-        X_train, y_train = X, y
+        y = keras.utils.to_categorical(y)
         X_val, y_val = kwargs.get('X_val'), kwargs.get('y_val')
-        X_val, y_val = filter_i_dont_knows(X_val, y_val)
 
-        y_train = keras.utils.to_categorical(y_train)
-        y_val = keras.utils.to_categorical(y_val)
+        if X_val is not None and y_val is not None:
+            X_val, y_val = filter_i_dont_knows(X_val, y_val)
+            y_val = keras.utils.to_categorical(y_val)
+            validation_data = (X_val, y_val)
+        else:
+            validation_data = None
 
         # Additional training.
-        self.model.add(Dense(y_train[0].size, name='output',
+        self.model.add(Dense(y[0].size, name='output',
                              activation='softmax'))
         print(self.model.output_shape)
         self.model.compile(
@@ -140,5 +142,5 @@ class TransferCNN(Model):
             optimizer='adam',
             metrics=['accuracy']
         )
-        self.model.fit(X_train, y_train, validation_data=(X_val, y_val),
+        self.model.fit(X, y, validation_data=validation_data,
                        epochs=15, batch_size=200, verbose=2)
