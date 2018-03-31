@@ -1,0 +1,5 @@
+scipy==0.19.1
+keras==2.0.9
+librosa==0.6.0
+matplotlib==2.2.0
+scikit-learn==0.19.1
