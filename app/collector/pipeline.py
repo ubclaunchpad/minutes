@@ -235,7 +235,8 @@ def build_spectrograms(video_id, save = True):
     logger.info("Spectrogram result shape: {}".format(imgs.shape))
     return imgs
 
-def build_base_training_spectrograms(speakers):
+
+def build_base_training_spectrograms(speakers, test_size = 0.2):
     """
          @param speakers - dict(string, list(string)) -
     """
@@ -245,12 +246,17 @@ def build_base_training_spectrograms(speakers):
         imgs = list()
         for path in paths:
             imgs.append(build_spectrograms(path))
+        speaker_chunk = np.vstack(imgs)
+        chunk_labels = np.zeros((speaker_chunk.shape[0], 1) dtype = np.int)
+        chunk_labels[:] = label
         if (X_data is None):
-            X_data = np.vstack(imgs)
+            X_data = speaker_chunk
+            y_data = chunk_labels
         else:
             X_data = X_data.vstack((X_data, imgs))
+            y_data = X_data.vstack((y_data, chunk_labels))
 
-    return X_train, y_train, X_validation, y_validation
+    return train_test_split(X_data, y_data, test_size)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
