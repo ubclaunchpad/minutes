@@ -14,10 +14,10 @@ RUN apt-get update -qq
 RUN apt-get install -y libpq-dev libjpeg-dev curl libav-tools
 
 # Dump the app in.
-ADD app/ /app/
+ADD minutes/ /minutes/
 
 # Head to the working directory.
-WORKDIR /app/
+WORKDIR /minutes/
 
 # Expose for production.
 EXPOSE 8081

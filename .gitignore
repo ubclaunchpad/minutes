@@ -1,6 +1,10 @@
+*.pyc
 nb/*
 .DS_Store
 app/collector/*
 !app/collector/*.py
 !app/collector/*.sh
 
+*.egg-info
+build/
+dist/
