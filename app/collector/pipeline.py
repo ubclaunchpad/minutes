@@ -185,11 +185,13 @@ def build(sample_id):
     logger.info('Completed succesfully.')
 
 
-def get_spectrograms(rows, output_file):
+def get_spectrograms(rows, output_file = None):
     """Converts a 2D table of rows into one spectrogram per row.
 
     Args:
-        (rows): A table of audio data.
+        (rows):         A table of audio data.
+        (output_file):  Path to the file to write to. If None, the data does not
+                        get saved to disk
     """
     min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 1))
 
@@ -209,23 +211,46 @@ def get_spectrograms(rows, output_file):
         numpy_output_static = np.flip(numpy_output_static, 0)
         imgs[i] = numpy_output_static
 
-    np.save(output_file, imgs)
+    if (output_file is not None):
+        np.save(output_file, imgs)
+
     return imgs
 
 
-def build_spectrograms(video_id):
+def build_spectrograms(video_id, save = True):
     """Builds spectrograms from an audio file and outputs them
     to a folder.
 
     Args:
-        video_id (str): The id of the YouTube video.
+        video_id (str):     The id of the YouTube video.
+        save     (bool):    Save the file to the disk
     """
     logger.info('Building spectrograms for {}'.format(video_id))
     sample_rate, signal = wav.read(AUDIO_FILE_LOC(video_id))
     observations = extract_observations(signal, SAMPLES_PER_OBSERVATION)
-    imgs = get_spectrograms(observations, SPECTROGRAM_FILE_LOC(video_id))
+    if (save is True):
+        imgs = get_spectrograms(observations, SPECTROGRAM_FILE_LOC(video_id))
+    else:
+        imgs = get_spectrograms(observations)
     logger.info("Spectrogram result shape: {}".format(imgs.shape))
+    return imgs
 
+def build_base_training_spectrograms(speakers):
+    """
+         @param speakers - dict(string, list(string)) -
+    """
+
+    label = 0
+    for speaker, paths in speakers.iterms():
+        imgs = list()
+        for path in paths:
+            imgs.append(build_spectrograms(path))
+        if (X_data is None):
+            X_data = np.vstack(imgs)
+        else:
+            X_data = X_data.vstack((X_data, imgs))
+
+    return X_train, y_train, X_validation, y_validation
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
