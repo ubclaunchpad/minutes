@@ -1,0 +1,24 @@
+package:
+  name: minutes
+  version: 0.0.1
+
+source:
+  git_rev: v0.0.1
+  git_url: https://github.com/ubclaunchpad/minutes.git
+
+requirements:
+  host:
+    - python
+    - setuptools
+
+  run:
+    - python
+
+test:
+  imports:
+    - minutes
+
+about:
+  home: https://github.com/ubclaunchpad/minutes
+  license: BSD
+  license_file: LICENSE
