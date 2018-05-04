@@ -24,4 +24,4 @@ install:
   - source activate minutes
 
 script:
-  - pytest -vvv --cov=minutes tests
+  - pytest -vvv --cov=minutes test
