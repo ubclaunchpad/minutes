@@ -38,3 +38,4 @@ def test_generate_training_data():
     minutes.add_speaker(speaker2)
 
     # TODO: Create training data and assert shape makes sense.
+    # data = minutes._generate_training_data()

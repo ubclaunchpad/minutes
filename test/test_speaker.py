@@ -14,3 +14,7 @@ def test_speaker_add_samples():
 
     speaker1.add_audio(SPEAKER2_AUDIO)
     assert len(speaker1.audio) == 2
+
+
+def test_speaker_observations():
+    pass

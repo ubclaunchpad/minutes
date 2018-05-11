@@ -18,8 +18,6 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-
-  # Replace dep1 dep2 ... with your dependencies
   - conda env create -f environment.yml
   - source activate minutes
 
