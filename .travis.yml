@@ -33,3 +33,7 @@ script:
   - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'tensorflow'/g' ~/.keras/keras.json;
   - echo -e "Running tests with the following config:\n$(cat ~/.keras/keras.json)"
   - KERAS_BACKEND=tensorflow pytest -vvv --cov=minutes test
+
+after_script:
+  - pip install coveralls
+  
