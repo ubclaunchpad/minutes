@@ -27,6 +27,6 @@ install:
 
 script:
   - python -c "import keras.backend"
-  - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'$KERAS_BACKEND'/g' ~/.keras/keras.json;
+  - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'tensorflow'/g' ~/.keras/keras.json;
   - echo -e "Running tests with the following config:\n$(cat ~/.keras/keras.json)"
-  - KERAS_BACKEND=$KERAS_BACKEND pytest -vvv --cov=minutes test
+  - KERAS_BACKEND=tensorflow pytest -vvv --cov=minutes test
