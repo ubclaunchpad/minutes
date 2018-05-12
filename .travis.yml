@@ -34,6 +34,8 @@ script:
   - echo -e "Running tests with the following config:\n$(cat ~/.keras/keras.json)"
   - KERAS_BACKEND=tensorflow pytest -vvv --cov=minutes test
 
-after_script:
-  - pip install coveralls
-  
+after_success:
+  - python -m pip install coveralls
+  # Coveralls complains about f-strings, ignore this because we caught linting
+  # already in the flake8 step.
+  - coveralls --ignore-errors
