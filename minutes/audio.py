@@ -31,7 +31,10 @@ class Audio:
             ms_per_observation {int} -- The number of desired ms per obs.
 
         Returns:
-            np.array -- An array of shape N x 1024 x 32 x 3; spectrograms.
+            np.array -- An array of spectrograms, one per row. The width
+            of each spectrogram depends on the ms_per_observation,
+            The number of rows depends on the length of the audio file
+            and the ms per observations.
 
         TODO: Provide different spectrogram creation options; for now
         mode='phase' is all you get.
