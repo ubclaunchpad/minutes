@@ -54,7 +54,7 @@ class BaseModel:
         y = to_categorical(flattened_labels)
         X = np.concatenate(obs)
 
-        # TODO: Propogate more configuration options to user.
+        # TODO: Propagate more configuration options to user.
         return train_test_split(X, y, test_size=self.test_size,
                                 random_state=self.random_state)
 

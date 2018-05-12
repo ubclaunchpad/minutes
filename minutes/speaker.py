@@ -1,6 +1,6 @@
 import numpy as np
 
-from .audio import Audio
+from minutes.audio import Audio
 
 
 class Speaker:
