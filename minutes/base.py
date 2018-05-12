@@ -32,11 +32,22 @@ class BaseModel:
         """Add a speaker to the model.
 
         Arguments:
-            speaker {Speaker} -- A Speaker object
+            speaker {Speaker} -- A new Speaker object to add to the model.
+            Must not have a name in conflict with existing speakers in model.
         """
         if speaker in self.speakers:
             raise LookupError(f'Speaker {speaker.name} already added.')
         self.speakers.add(speaker)
+
+    def add_speakers(self, speakers):
+        """Add a collection of speakers to the model.
+
+        Arguments:
+            speakers {List[Speaker]} -- A collection of Speakers with unique
+            names.
+        """
+        for speaker in speakers:
+            self.add_speaker(speaker)
 
     def _generate_training_data(self):
         """Generates training data for the model.

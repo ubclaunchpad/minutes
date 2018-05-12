@@ -6,10 +6,17 @@ import test.config as c
 
 def test_add_speakers():
     minutes = Minutes()
+    assert len(minutes.speakers) == 0
+
     minutes.add_speaker(c.SPEAKER1)
     assert len(minutes.speakers) == 1
 
     minutes.add_speaker(c.SPEAKER2)
+    assert len(minutes.speakers) == 2
+
+    minutes = Minutes()
+    assert len(minutes.speakers) == 0
+    minutes.add_speakers([c.SPEAKER1, c.SPEAKER2])
     assert len(minutes.speakers) == 2
 
 
