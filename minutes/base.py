@@ -23,7 +23,6 @@ class BaseModel:
         self.name = name
         self.speakers = set()
         self.test_size = test_size
-        self.fitted = False
         self.random_state = random_state
         self.ms_per_observation = ms_per_observation
         self.model = None

@@ -2,9 +2,6 @@ import numpy as np
 import scipy.signal as signal
 from scipy.io import wavfile as wav
 
-SPECTROGRAM_HEIGHT = 1024
-NUM_CHANNELS = 3
-
 
 class Audio:
 
