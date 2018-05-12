@@ -25,6 +25,9 @@ install:
   - conda env create -f environment.yml
   - source activate minutes
 
+before_script:
+  - python -m flake8
+
 script:
   - python -c "import keras.backend"
   - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'tensorflow'/g' ~/.keras/keras.json;

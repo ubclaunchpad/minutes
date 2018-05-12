@@ -17,7 +17,7 @@ class Speaker:
 
     def add_audio(self, audio_loc):
         """Add an audio sample to this speaker.
-        
+
         Arguments:
             audio_loc {str} -- Location of the audio sample.
         """

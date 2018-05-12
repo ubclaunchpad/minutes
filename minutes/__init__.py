@@ -1,2 +1,2 @@
-from .minutes import Minutes
-from .speaker import Speaker
+from .minutes import Minutes  # noqa
+from .speaker import Speaker  # noqa

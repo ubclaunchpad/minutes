@@ -16,4 +16,4 @@ setup(name='minutes',
         'librosa==0.6.0',
         'matplotlib==2.2.0'
       ]
-     )
+      )
