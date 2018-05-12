@@ -1,8 +1,12 @@
+sudo: required
+dist: trusty
 language: python
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
+matrix:
+    include:
+        - python: 2.7
+          env: KERAS_BACKEND=tensorflow
+        - python: 3.6
+          env: KERAS_BACKEND=tensorflow
 
 install:
   # From https://conda.io/docs/user-guide/tasks/use-conda-with-travis-ci.html.
@@ -22,4 +26,7 @@ install:
   - source activate minutes
 
 script:
-  - pytest -vvv --cov=minutes test
+  - python -c "import keras.backend"
+  - sed -i -e 's/"backend":[[:space:]]*"[^"]*/"backend":\ "'$KERAS_BACKEND'/g' ~/.keras/keras.json;
+  - echo -e "Running tests with the following config:\n$(cat ~/.keras/keras.json)"
+  - KERAS_BACKEND=$KERAS_BACKEND pytest -vvv --cov=minutes test
