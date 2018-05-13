@@ -20,5 +20,5 @@ test:
 
 about:
   home: https://github.com/ubclaunchpad/minutes
-  license: BSD
+  license: MIT
   license_file: LICENSE
