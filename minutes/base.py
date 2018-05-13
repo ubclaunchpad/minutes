@@ -68,34 +68,32 @@ class BaseModel:
         return train_test_split(X, y, test_size=self.test_size,
                                 random_state=self.random_state)
 
-    def fit(self):
+    def fit(self, verbose=0):
         """Fit a model according to the speakers currently added."""
         K.set_image_dim_ordering('tf')
 
-        (X_train, X_test), (y_train, y_test) = self._generate_training_data()
+        X_train, X_test, y_train, y_test = self._generate_training_data()
 
-        # Sequential Model
-        self.model = Sequential()
+        self.model = Sequential([
+            Conv1D(32, 32, strides=4,
+                   input_shape=X_train[0].shape,
+                   activation='relu'),
+            Dropout(0.5),
+            Conv1D(64, 8, strides=2, activation='relu'),
+            Dropout(0.2),
+            Conv1D(128, 1, activation='relu'),
+            MaxPooling1D(pool_size=2),
+            Dropout(0.2),
+            Flatten(),
+            Dense(128, activation='relu'),
+            Dense(y_train[0].size, activation='softmax'),
+        ])
 
-        # Add several convolutional layers with dropout.
-        self.model.add(Conv2D(32, (32, 4), strides=(16, 4),
-                       input_shape=X_train.shape, activation='relu'))
-        self.model.add(Dropout(0.5))
-        self.model.add(Conv2D(64, (8, 5), strides=(4, 2),
-                       activation='relu'))
-        self.model.add(Dropout(0.2))
-        self.model.add(Conv2D(128, (1, 1), activation='relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        self.model.add(Dropout(0.2))
-
-        # Flatten and add dense layers.
-        self.model.add(Flatten())
-        self.model.add(Dense(128, activation='relu'))
-        self.model.add(Dense(y_train[0].size, activation='softmax'))
-        self.model.compile(loss='categorical_crossentropy', optimizer='adam',
-                           metrics=['accuracy'])
+        opt = SGD(lr=0.001)
+        self.model.compile(loss='categorical_crossentropy', optimizer=opt,
+                  metrics=['accuracy'])
         self.model.fit(X_train, y_train, validation_data=(X_test, y_test),
-                       epochs=50, batch_size=400, verbose=2, shuffle='batch')
+                       epochs=50, batch_size=32, verbose=2)
 
     def save(self):
         """Save the model... somewhere."""

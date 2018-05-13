@@ -35,7 +35,7 @@ script:
   - KERAS_BACKEND=tensorflow pytest -vvv --cov=minutes test
 
 after_success:
-  - python -m pip install coveralls
+  - python -m pip install python-coveralls
   # Coveralls complains about f-strings, ignore this because we caught linting
   # already in the flake8 step.
   - coveralls --ignore-errors
