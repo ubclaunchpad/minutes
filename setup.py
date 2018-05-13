@@ -3,9 +3,9 @@ from setuptools import setup
 setup(
     name='minutes',
     version='0.0.1',
-    description='Speaker Diarization Library',
-    author='UBC Launchpad',
-    author_email='team@ubclauncpad.com',
+    description='Speaker diarization via transfer learning',
+    author='UBC Launch Pad',
+    author_email='team@ubclaunchpad.com',
     url='https://www.ubclaunchpad.com',
     packages=['minutes'],
     install_requires=[
