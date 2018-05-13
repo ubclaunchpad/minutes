@@ -1,10 +1,11 @@
 import os
 
+from keras import backend as K
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.utils import to_categorical
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras import backend as K
+from keras.layers.convolutional import Conv1D, MaxPooling1D
+from keras.optimizers import SGD
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -91,7 +92,7 @@ class BaseModel:
 
         opt = SGD(lr=0.001)
         self.model.compile(loss='categorical_crossentropy', optimizer=opt,
-                  metrics=['accuracy'])
+                           metrics=['accuracy'])
         self.model.fit(X_train, y_train, validation_data=(X_test, y_test),
                        epochs=50, batch_size=32, verbose=2)
 
