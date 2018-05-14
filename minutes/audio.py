@@ -76,7 +76,7 @@ class Audio:
         data = data.reshape((N, d))
 
         def spec_from_row(row):
-            _, _, Sxx = signal.spectrogram(row, mode='phase')
+            _, _, Sxx = signal.spectrogram(row)
             return Sxx
 
         # This is very slow! Perhaps some logging?

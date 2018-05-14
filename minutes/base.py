@@ -17,9 +17,9 @@ class BaseModel:
 
     @property
     def fitted(self):
-        return self.model is None
+        return self.model is not None
 
-    def __init__(self, name, ms_per_observation=1000, test_size=0.33,
+    def __init__(self, name, ms_per_observation=3000, test_size=0.33,
                  random_state=42):
         self.name = name
         self.speakers = set()
@@ -76,25 +76,26 @@ class BaseModel:
         X_train, X_test, y_train, y_test = self._generate_training_data()
 
         self.model = Sequential([
-            Conv1D(32, 32, strides=4,
-                   input_shape=X_train[0].shape,
+            Conv1D(32, 32, strides=2, input_shape=X_train[0].shape,
                    activation='relu'),
-            Dropout(0.5),
-            Conv1D(64, 8, strides=2, activation='relu'),
-            Dropout(0.2),
-            Conv1D(128, 1, activation='relu'),
             MaxPooling1D(pool_size=2),
-            Dropout(0.2),
+            Dropout(0.5),
             Flatten(),
             Dense(128, activation='relu'),
             Dense(y_train[0].size, activation='softmax'),
         ])
 
-        opt = SGD(lr=0.001)
-        self.model.compile(loss='categorical_crossentropy', optimizer=opt,
-                           metrics=['accuracy'])
-        self.model.fit(X_train, y_train, validation_data=(X_test, y_test),
-                       epochs=50, batch_size=32, verbose=2)
+        self.model.compile(
+            loss='categorical_crossentropy',
+            optimizer=SGD(lr=0.001),
+            metrics=['accuracy']
+        )
+
+        self.model.fit(
+            X_train, y_train,
+            validation_data=(X_test, y_test),
+            epochs=50, batch_size=16, verbose=verbose
+        )
 
     def save(self):
         """Save the model... somewhere."""

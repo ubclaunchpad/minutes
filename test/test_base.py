@@ -39,14 +39,16 @@ def test_generate_training_data():
     Xtr, Xt, ytr, yt = model._generate_training_data()
 
     # Built spectrograms with shape (129, 19), one-hot labels.
-    assert Xtr.shape == (131, 129, 19)
-    assert ytr.shape == (131, 2)
-    assert Xt.shape == (66, 129, 19)
-    assert yt.shape == (66, 2)
+    assert Xtr.shape == (218, 129, 7)
+    assert ytr.shape == (218, 2)
+    assert Xt.shape == (108, 129, 7)
+    assert yt.shape == (108, 2)
 
 
 def test_train():
     model = BaseModel('taco', ms_per_observation=100)
     model.add_speaker(c.SPEAKER1)
     model.add_speaker(c.SPEAKER2)
-    # model.fit()
+    assert not model.fitted
+    model.fit()
+    assert model.fitted

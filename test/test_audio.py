@@ -6,7 +6,7 @@ import test.config as c
 
 def test_add_audio():
     audio = Audio(c.SPEAKER1_AUDIO)
-    assert audio.rate == 44100
+    assert audio.rate == 16000
 
 
 def test_samples_per_observation():
@@ -16,6 +16,6 @@ def test_samples_per_observation():
 
 def test_get_spectrograms():
     audio = Audio(c.SPEAKER1_AUDIO)
-    spec = audio.get_spectrograms(1000)
-    assert spec.shape == (17, 129, 196)
+    spec = audio.get_spectrograms(3000)
+    assert spec.shape == (5, 129, 214)
     assert spec.dtype == np.float64
