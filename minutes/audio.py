@@ -52,9 +52,6 @@ class Audio:
             of each spectrogram depends on the ms_per_observation,
             The number of rows depends on the length of the audio file
             and the ms per observations.
-
-        TODO: Provide different spectrogram creation options; for now
-        mode='phase' is all you get.
         """
         d = self.samples_per_observation(ms_per_observation)
         N = len(self.data) // d
