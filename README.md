@@ -6,31 +6,23 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/ubclaunchpad/minutes/badge.svg)](https://coveralls.io/github/ubclaunchpad/minutes)
 
-Audio speaker diarization and transcription library.
+Audio speaker diarization library.
 
 ## Under Construction!
 
 ## :running: Development
 
-To use our [conda](https://conda.io/docs/user-guide/install/index.html) environment,
+Dependencies are managed using a `Pipfile` and [Pipenv](https://github.com/pypa/pipenv):
 
 ```bash
-conda env create -f environment.yml
-source activate minutes
+pipenv install
+pipenv shell
 ```
 
 ## Testing
 
 ```bash
 pytest --cov=minutes -vvv test
-```
-
-## Building the Conda Package
-
-Specify a new git version tag, edit the `meta.yml` and run:
-
-```bash
-conda-build .
 ```
 
 ## Example Usage
