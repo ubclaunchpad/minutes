@@ -4,79 +4,45 @@
 
 [![Build Status](https://travis-ci.org/ubclaunchpad/minutes.svg?branch=master)](https://travis-ci.org/ubclaunchpad/minutes)
 
-Audio speaker diarization and transcription API.
+[![Coverage Status](https://coveralls.io/repos/github/ubclaunchpad/minutes/badge.svg)](https://coveralls.io/github/ubclaunchpad/minutes)
 
-## :running: Getting Started
+Audio speaker diarization library.
 
-To use our [conda](https://conda.io/docs/user-guide/install/index.html) environment,
+## Under Construction!
 
-```bash
-conda env create -f environment.yml
-source activate minutes
-```
+## :running: Development
 
-### :rocket: Running the Server
-
-To run the server in the docker container, run:
-
-```
-make build-prod
-make run
-```
-
-To run it using conda, run:
-
-```
-source activate minutes
-python app/main.py
-```
-
-### :rainbow: Running the Research Environment
-
-```
-make build-dev
-make dev
-```
-
-## :point_up: Deployment
-
-We deploy continuously using Travis CI and a Docker Hub deploy bot.
-
-You can also deploy the production and development images manually if you like.
-
-```
-make push-dev
-make push-prod
-```
-
-You will need to set `DOCKER_USERNAME` and `DOCKER_PASSWORD` and be a member of the `ubclaunchpad` docker hub organization to deploy manually.
-
-## :computer: Creating Training Data
-
-We have a pipeline that is designed to take YouTube videos with
-transcripts and convert them into training data. `pipeline.py`
-is a CLI that will attempt to download the transcript and audio
-data for a given video, as well as prompt for some information
-that the rest of the pipeline uses to create labelled data
-(ie. what delimeters are used to identify speakers).
+Dependencies are managed using a `Pipfile` and [Pipenv](https://github.com/pypa/pipenv):
 
 ```bash
-$ cd app/collector
-$ ./pipeline.py <video_id>
+pipenv install
+pipenv shell
 ```
 
-## :point_right: Pushing Training Data
-
-You can push training data into the research environment on DigitalOcean.
-You will need to collect the instance PEM file from your tech lead. Place
-the PEM locally in `~/.ssh/id_minutes`. Set the environment variable
-`MINUTES_RESEARCH_INSTANCE` in your environment to the IP address of the
-DigitalOcean instance (available on Slack or from your tech lead).
-
-Then, if you wish to push the file `bigdata.csv`, use the following command:
+## Testing
 
 ```bash
-make FILE=bigdata.csv push-data
+pytest --cov=minutes -vvv test
 ```
 
-It will appear in the `data` folder on the research platform.
+## Example Usage
+
+```python
+from minutes import Speaker, Minutes
+
+minutes = Minutes(ms_per_observation=500, model='cnn')
+
+# Create some speakers with some audio.
+speaker1 = Speaker('speaker1')
+speaker1.add_audio('path/to/audio1.wav')
+
+speaker2 = Speaker('speaker2')
+speaker2.add_audio('path/to/audio2.wav')
+
+# Add speakers to the model.
+minutes.add_speakers([speaker1, speaker2])
+
+# Fit the model.
+minutes.fit()
+result = minutes.predict()
+```
