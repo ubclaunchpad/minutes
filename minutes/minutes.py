@@ -66,11 +66,13 @@ class Minutes(BaseModel):
             verbose=verbose
         )
 
-    def predict(self, conversation):
+    def phrases(self, conversation):
         """Predict against a new conversation.
 
         Arguments:
             conversation {Conversation} -- A conversation built from an audio
             sample.
+
+        Returns: <TODO>
         """
         pass  # TODO
