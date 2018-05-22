@@ -32,13 +32,7 @@ from minutes import Speaker, Minutes, Conversation
 
 minutes = Minutes(parent='cnn')
 
-s1.add_audio('test/fixtures/1447')  # Audio book speakers.
-s2.add_audio('test/fixtures/669')
-s3.add_audio('test/fixtures/5561')
-
-minutes.fit(verbose=2)
-
-# Create some speakers with some audio.
+# Create some speakers, add some audio.
 s1, s2 = Speaker('s1'), Speaker('s2')
 s1.add_audio('path/to/audio1')
 s2.add_audio('path/to/audio2')
