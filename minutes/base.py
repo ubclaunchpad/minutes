@@ -1,7 +1,9 @@
+import json
 import os
+import pickle
 
 from keras import backend as K
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Flatten
 from keras.utils import to_categorical
 from keras.layers.convolutional import Conv1D, MaxPooling1D
@@ -9,15 +11,51 @@ from keras.optimizers import SGD
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from minutes.models import MODELS_DIR
+from minutes.models import MINUTES_BASE_MODEL_DIRECTORY
 
 
 class BaseModel:
     """Utility for building base models."""
 
+    intialization_params = {
+        'name',
+        'ms_per_observation',
+        'test_size',
+        'random_state',
+    }
+
     @property
     def fitted(self):
         return self.model is not None
+
+    @property
+    def home(self):
+        return os.path.join(MINUTES_BASE_MODEL_DIRECTORY, self.name)
+
+    @classmethod
+    def load_model(cls, name):
+        """Loads a BaseModel from a location on disk.
+
+        Arguments:
+            loc {str} -- Location of a pickled model on disk.
+
+        Returns:
+            [type] -- A BaseModel.
+        """
+        home = cls(name).home
+
+        # Initialize the object with the paramters in the file.
+        with open(os.path.join(home, 'params.json'), 'r') as handle:
+            params = json.load(handle)
+            model = cls(**params)
+
+        # Pull the model from disk
+        try:
+            model.model = load_model(os.path.join(home, 'keras.h5'))
+        except OSError:
+            model.model = None
+
+        return model
 
     def __init__(self, name, ms_per_observation=3000, test_size=0.33,
                  random_state=42):
@@ -97,6 +135,18 @@ class BaseModel:
             epochs=50, batch_size=16, verbose=verbose
         )
 
-    def save(self):
-        """Save the model... somewhere."""
-        self.model.save(os.path.join(MODELS_DIR, self.name + '.h5'))
+    def save_model(self):
+        """Save the model as a pickle."""
+        os.makedirs(self.home, exist_ok=True)
+
+        # Save initialization parameters.
+        with open(os.path.join(self.home, 'params.json'), 'w') as handle:
+            params = {
+                k: v for k, v in self.__dict__.items()
+                if k in self.intialization_params
+            }
+            json.dump(params, handle)
+
+        # Save internal model.
+        if self.model is not None:
+            self.model.save(os.path.join(self.home, 'keras.h5'))

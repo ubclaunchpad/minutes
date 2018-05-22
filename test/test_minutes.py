@@ -3,8 +3,8 @@ import test.config as c
 
 
 def test_train():
-    for model_name in Minutes.models:
-        minutes = Minutes(model=model_name, ms_per_observation=3000)
+    for model_name in Minutes.parents:
+        minutes = Minutes(parent=model_name)
         minutes.add_speaker(c.SPEAKER1)
         minutes.add_speaker(c.SPEAKER2)
 

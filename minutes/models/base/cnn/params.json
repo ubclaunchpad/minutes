@@ -1,0 +1,6 @@
+{
+    "name": "cnn",
+    "ms_per_observation": 3000,
+    "test_size": 0.33,
+    "random_state": 42
+}
