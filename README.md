@@ -47,5 +47,5 @@ minutes.fit()
 conversation = Conversation('/path/to/conversation.wav')
 
 # Create phrases from the conersation.
-phrases = model.phrases(conversation)
+phrases = minutes.phrases(conversation)
 ```
