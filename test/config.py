@@ -22,14 +22,15 @@ SPEAKER2.add_audio(SPEAKER2_AUDIO)
 
 
 @contextlib.contextmanager
-def cd(newdir, cleanup=lambda: True):
+def cd(newdir, cleanup=None):
     prevdir = os.getcwd()
     os.chdir(os.path.expanduser(newdir))
     try:
         yield
     finally:
         os.chdir(prevdir)
-        cleanup()
+        if cleanup is not None:
+            cleanup()
 
 
 @contextlib.contextmanager
