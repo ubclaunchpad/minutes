@@ -30,7 +30,7 @@ class Minutes(BaseModel):
         """Construct a new model for transfer learning.
 
         Keyword Arguments:
-            model {str} -- The model choice. (default: {'cnn'})
+            parent {str} -- The model choice. (default: {'cnn'})
             test_size {float} -- The size of the test dataset (default: {0.33})
             random_state {int} -- For reproducibility (default: {42})
         """

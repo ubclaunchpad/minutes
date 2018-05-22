@@ -34,9 +34,7 @@ def cd(newdir, cleanup=lambda: True):
 
 @contextlib.contextmanager
 def tempdir():
+    """Creates a temporary directory for files used during tests."""
     dirpath = tempfile.mkdtemp()
-
-    def cleanup():
-        shutil.rmtree(dirpath)
-    with cd(dirpath, cleanup):
+    with cd(dirpath, lambda: shutil.rmtree(dirpath)):
         yield dirpath
