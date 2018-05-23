@@ -46,6 +46,6 @@ minutes.fit()
 # Collect a new conversation for prediction.
 conversation = Conversation('/path/to/conversation.wav')
 
-# Create phrases from the conersation.
-phrases = model.phrases(conversation)
+# Create phrases from the conversation.
+phrases = minutes.phrases(conversation)
 ```
