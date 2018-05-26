@@ -34,13 +34,16 @@ class BaseModel:
 
     @classmethod
     def load_model(cls, name):
-        """Loads a BaseModel from a location on disk.
+        """Loads a BaseModel from disk.
 
         Arguments:
-            loc {str} -- Location of a pickled model on disk.
+            name {str} -- The name of the model; by default, will load a
+            builtin Minutes base model. If the MINUTES_MODELS_DIRECTORY
+            environment variable is set, then minutes will look there for
+            user defined models.
 
         Returns:
-            [type] -- A BaseModel.
+            BaseModel -- A model collected from disk.
         """
         home = cls(name).home
 
