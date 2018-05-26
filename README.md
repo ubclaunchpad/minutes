@@ -28,21 +28,24 @@ pytest --cov=minutes -vvv test
 ## Example Usage
 
 ```python
-from minutes import Speaker, Minutes
+from minutes import Speaker, Minutes, Conversation
 
-minutes = Minutes(ms_per_observation=500, model='cnn')
+minutes = Minutes(parent='cnn')
 
-# Create some speakers with some audio.
-speaker1 = Speaker('speaker1')
-speaker1.add_audio('path/to/audio1.wav')
-
-speaker2 = Speaker('speaker2')
-speaker2.add_audio('path/to/audio2.wav')
+# Create some speakers, add some audio.
+s1, s2 = Speaker('s1'), Speaker('s2')
+s1.add_audio('path/to/audio1')
+s2.add_audio('path/to/audio2')
 
 # Add speakers to the model.
-minutes.add_speakers([speaker1, speaker2])
+minutes.add_speakers([s1, s2])
 
 # Fit the model.
 minutes.fit()
-result = minutes.predict()
+
+# Collect a new conversation for prediction.
+conversation = Conversation('/path/to/conversation.wav')
+
+# Create phrases from the conversation.
+phrases = minutes.phrases(conversation)
 ```

@@ -1,4 +1,4 @@
-from audio import Audio
+from minutes.audio import Audio
 
 
 class Conversation:
@@ -28,12 +28,3 @@ class Conversation:
         """
         return self.audio.get_spectrograms(ms_per_observation, verbose)
 
-    def phrases(self, model):
-        """Given a trained model, recreates phrases from the internal
-        audio sample.
-
-        Arguments:
-            model {keras.model} -- A model trained on the speakers in
-            the converstation.
-        """
-        pass  # TODO
