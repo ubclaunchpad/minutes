@@ -16,13 +16,6 @@ class Minutes(BaseModel):
     parents = os.listdir(MINUTES_BASE_MODEL_DIRECTORY)
 
     @property
-    def base_models(self):
-        """All of the base models available in the location given by the
-        MINUTES_MODELS_DIRECTORY environment variable.
-        """
-        return self.parents
-
-    @property
     def home(self):
         return os.path.join(MINUTES_TRANSFER_DIRECTORY, self.name)
 
