@@ -20,7 +20,7 @@ class Minutes(BaseModel):
         """All of the base models available in the location given by the
         MINUTES_MODELS_DIRECTORY environment variable.
         """
-        return os.listdirs(MINUTES_BASE_MODEL_DIRECTORY)
+        return self.parents
 
     @property
     def home(self):
