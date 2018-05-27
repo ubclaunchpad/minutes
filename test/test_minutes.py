@@ -11,3 +11,7 @@ def test_train():
         assert minutes.fitted is False
         minutes.fit()
         assert minutes.fitted is True
+
+
+def test_parents():
+    assert Minutes.parents == ['cnn']
