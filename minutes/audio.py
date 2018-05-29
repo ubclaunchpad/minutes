@@ -40,18 +40,16 @@ class Audio:
         """
         return int(self.rate * ms_per_observation / 1000.)
 
-    def get_spectrograms(self, ms_per_observation, verbose=False):
-        """Converts a internal table of raw audio audio phrases into with
-        one spectrogram per row.
+    def get_observations(self, ms_per_observation, verbose=False):
+        """Converts a internal raw audio vector into table with
+        one observations per row.
 
         Arguments:
             ms_per_observation {int} -- The number of desired ms per obs.
 
         Returns:
-            np.array -- An array of spectrograms, one per row. The width
-            of each spectrogram depends on the ms_per_observation,
-            The number of rows depends on the length of the audio file
-            and the ms per observations.
+            np.array -- An array of observations, one per row. The width
+            of each row depends on the ms_per_observation,
         """
         d = self.samples_per_observation(ms_per_observation)
         N = len(self.data) // d
@@ -70,7 +68,21 @@ class Audio:
             print('Truncating {} bytes from end of sample'.format(t))
 
         # Reshape for processing into spectrograms.
-        data = data.reshape((N, d))
+        return data.reshape((N, d))
+
+    def get_spectrograms(self, ms_per_observation, verbose=False):
+        """Converts a internal raw audio vector into table with
+        one spectrogram per row.
+
+        Arguments:
+            ms_per_observation {int} -- The number of desired ms per obs.
+
+        Returns:
+            np.array -- An array of spectrograms, one per row. The width
+            of each spectrogram depends on the ms_per_observation.
+        """
+        # Reshape for processing into spectrograms.
+        data = self.get_observations(ms_per_observation, verbose)
 
         def spec_from_row(row):
             _, _, Sxx = signal.spectrogram(row)

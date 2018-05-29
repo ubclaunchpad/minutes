@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 
 from keras import backend as K
 from keras.models import Sequential, load_model
@@ -12,6 +11,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from minutes.models import MINUTES_BASE_MODEL_DIRECTORY
+from minutes.phrase import Phrase
 
 
 class BaseModel:
@@ -63,7 +63,7 @@ class BaseModel:
     def __init__(self, name, ms_per_observation=3000, test_size=0.33,
                  random_state=42):
         self.name = name
-        self.speakers = set()
+        self.speakers = []
         self.test_size = test_size
         self.random_state = random_state
         self.ms_per_observation = ms_per_observation
@@ -78,7 +78,7 @@ class BaseModel:
         """
         if speaker in self.speakers:
             raise LookupError(f'Speaker {speaker.name} already added.')
-        self.speakers.add(speaker)
+        self.speakers.append(speaker)
 
     def add_speakers(self, speakers):
         """Add a collection of speakers to the model.
@@ -153,3 +153,30 @@ class BaseModel:
         # Save internal model.
         if self.model is not None:
             self.model.save(os.path.join(self.home, 'keras.h5'))
+
+    def phrases(self, conversation):
+        """Predict against a new conversation.
+
+        Arguments:
+            conversation {Conversation} -- A conversation built from an audio
+            sample.
+
+        Returns:
+            List[Phrase] -- A list of Phrases.
+        """
+        # Predict against the conversation spectrograms.
+        X_hat = conversation.get_spectrograms(self.ms_per_observation)
+        result = self.model.predict(X_hat)
+        y_hat_indices = np.argmax(result, axis=1)
+        y_hat = np.array(self.speakers)[y_hat_indices]
+
+        # Convert to a list of phrases.
+        # TODO: This is extra work, we already converted the 
+        # observations when we called get_spectrograms. We can
+        # speed things up by somehow caching that result (or returning it)
+        # if it is prohibitably costly to regenerate these.
+        obs = conversation.get_observations(self.ms_per_observation)
+        return [Phrase(o, speaker) for o, speaker in zip(obs, y_hat)]
+
+    def __str__(self):
+        return self.name
