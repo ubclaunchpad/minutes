@@ -1,4 +1,8 @@
+import contextlib
 import os
+import shutil
+import tempfile
+
 
 from minutes import Speaker
 
@@ -15,3 +19,23 @@ SPEAKER1.add_audio(SPEAKER1_AUDIO)
 
 SPEAKER2 = Speaker('speaker2')
 SPEAKER2.add_audio(SPEAKER2_AUDIO)
+
+
+@contextlib.contextmanager
+def cd(newdir, cleanup=None):
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
+        if cleanup is not None:
+            cleanup()
+
+
+@contextlib.contextmanager
+def tempdir():
+    """Creates a temporary directory for files used during tests."""
+    dirpath = tempfile.mkdtemp()
+    with cd(dirpath, lambda: shutil.rmtree(dirpath)):
+        yield dirpath

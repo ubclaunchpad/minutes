@@ -1,3 +1,4 @@
+# Development
 .DS_Store
 .cache
 .coverage
@@ -5,3 +6,10 @@
 *.pyc
 .ipynb_checkpoints/
 *.ipynb
+.vscode
+
+
+# Audio (force add for fixtures)
+**/*.wav
+**/*.flac
+**/*.txt

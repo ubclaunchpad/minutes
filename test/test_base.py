@@ -1,5 +1,9 @@
+import os
 import pytest
+import unittest.mock as mock
 
+
+from minutes.models import MINUTES_MODELS_DIRECTORY
 from minutes.base import BaseModel
 import test.config as c
 
@@ -52,3 +56,32 @@ def test_train():
     assert not model.fitted
     model.fit()
     assert model.fitted
+
+
+def test_save_and_load_model():
+    # Create a temp directory for model serialization.
+    m = BaseModel.load_model('cnn')
+    with c.tempdir() as models_dir:
+        with mock.patch('minutes.base.MINUTES_BASE_MODEL_DIRECTORY',
+                        models_dir):
+            # Save to redirected tmp model directory.
+            m.name = 'taco'
+            m.save_model()
+
+            # Check directory structure.
+            assert 'taco' in os.listdir(models_dir)
+            assert 'params.json' in os.listdir(m.home)
+            assert 'keras.h5' in os.listdir(m.home)
+
+            del m
+
+            # Reload the model.
+            model = BaseModel.load_model('taco')
+            assert model.ms_per_observation == 3000
+            assert model.name == 'taco'
+
+
+def test_home():
+    assert BaseModel('taco').home == os.path.join(
+        MINUTES_MODELS_DIRECTORY, 'base/taco'
+    )

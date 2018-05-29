@@ -16,6 +16,8 @@ pytest = "*"
 pytest-cov = "*"
 "flake8" = "*"
 python-coveralls = "*"
+ipdb = "*"
+jupyterlab = "*"
 
 [requires]
 python_version = "3.6"
