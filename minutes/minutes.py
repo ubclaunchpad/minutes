@@ -52,7 +52,7 @@ class Minutes(BaseModel):
         self.model.layers.pop()
         self.model.layers.pop()
 
-        d1 = Dense(128, activation='softmax', name='transfer_dense_1')
+        d1 = Dense(128, activation='relu', name='transfer_dense_1')
         d2 = Dense(y_train[0].size, activation='softmax', name='output_1')
 
         self.model.add(d1)
