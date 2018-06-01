@@ -1,6 +1,6 @@
 import numpy as np
 
-from minutes import Minutes
+from minutes import Minutes, Conversation
 import test.config as c
 
 
@@ -26,11 +26,12 @@ def test_phrases():
         minutes.add_speaker(c.SPEAKER2)
         minutes.fit()
 
-        # Predict new phrases.
-        phrases = minutes.phrases(c.CONVERSATION)
-        speakers = [p.speaker.name for p in phrases]
+        # Predict new phrases (make sure we ony predict once per obs)
+        conversation = Conversation(c.CONVERSATION_AUDIO, minutes)
+        raw, _ = conversation.get_observations(**minutes.preprocessing_params)
+        assert len(conversation.phrases) == len(raw)
+        print(conversation.phrases)
 
-        ms_per_obs = minutes.parent.ms_per_observation
-        num_obs = c.CONVERSATION.get_observations(ms_per_obs)
-        assert len(phrases) == len(num_obs)
-        assert sorted(list(np.unique(speakers))) == ['speaker1', 'speaker2']
+        # Make sure we ony predicted on speaker 1 and 2.
+        names = [p.speaker.name for p in conversation.phrases]
+        assert sorted(list(np.unique(names))) == ['speaker1', 'speaker2']

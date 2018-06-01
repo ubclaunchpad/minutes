@@ -8,6 +8,9 @@ import soundfile as sf
 
 
 class Audio:
+    """Internal audio maninpulation class. I reserve the right to change this
+    API :)
+    """
 
     def __init__(self, audio_loc):
         if os.path.isdir(audio_loc):
@@ -40,17 +43,19 @@ class Audio:
         """
         return int(self.rate * ms_per_observation / 1000.)
 
-    def get_observations(self, ms_per_observation, verbose=False):
+    def get_observations(self, ms_per_observation):
         """Converts a internal raw audio vector into table with
-        one observations per row.
+        one spectrogram per row. Also returns raw observations.
 
         Arguments:
             ms_per_observation {int} -- The number of desired ms per obs.
 
         Returns:
-            np.array -- An array of observations, one per row. The width
-            of each row depends on the ms_per_observation,
+            raw -- The raw audio observation table.
+            processed -- An array of spectrograms, one per row. The width
+            of each spectrogram depends on the ms_per_observation.
         """
+        # Reshape for processing into spectrograms.
         d = self.samples_per_observation(ms_per_observation)
         N = len(self.data) // d
 
@@ -63,31 +68,14 @@ class Audio:
         # Truncate last (partial) observation.
         data = data[:N * d]
 
-        if verbose:
-            t = len(self.data) - (N * d)
-            print('Truncating {} bytes from end of sample'.format(t))
-
         # Reshape for processing into spectrograms.
-        return data.reshape((N, d))
-
-    def get_spectrograms(self, ms_per_observation, verbose=False):
-        """Converts a internal raw audio vector into table with
-        one spectrogram per row.
-
-        Arguments:
-            ms_per_observation {int} -- The number of desired ms per obs.
-
-        Returns:
-            np.array -- An array of spectrograms, one per row. The width
-            of each spectrogram depends on the ms_per_observation.
-        """
-        # Reshape for processing into spectrograms.
-        data = self.get_observations(ms_per_observation, verbose)
+        raw = data.reshape((N, d))
 
         def spec_from_row(row):
             _, _, Sxx = signal.spectrogram(row)
             return Sxx
 
         # This is very slow! Perhaps some logging?
-        rows = (spec_from_row(row) for row in data)
-        return np.array([x for x in rows])
+        rows = (spec_from_row(row) for row in raw)
+        processed = np.array([x for x in rows])
+        return raw, processed

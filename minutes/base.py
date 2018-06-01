@@ -11,7 +11,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from minutes.models import MINUTES_BASE_MODEL_DIRECTORY
-from minutes.phrase import Phrase
 
 
 class BaseModel:
@@ -23,6 +22,19 @@ class BaseModel:
         'test_size',
         'random_state',
     }
+
+    @property
+    def preprocessing_params(self):
+        """Returns a mapping of parameters that are required to do preprocessing
+        of audio data suitable for this model. Useful as kwargs to audio
+        manipulation classes.
+        """
+        return {
+            i: getattr(self, i) for i in self.intialization_params
+            if i in {
+                'ms_per_observation',
+            }
+        }
 
     @property
     def fitted(self):
@@ -98,8 +110,12 @@ class BaseModel:
             y -- a categorical one-hot encoding of different speakers
             numbered 1..k.
         """
-        obs = [s.get_observations(self.ms_per_observation)
-               for s in self.speakers]
+        obs = []
+        for s in self.speakers:
+            _, processed = s.get_observations(**self.preprocessing_params)
+            obs += processed,
+
+        # Generate and flatten labels.
         labels = [[i] * len(o) for i, o in enumerate(obs)]
         flattened_labels = [j for i in labels for j in i]
 
@@ -154,29 +170,20 @@ class BaseModel:
         if self.model is not None:
             self.model.save(os.path.join(self.home, 'keras.h5'))
 
-    def phrases(self, conversation):
-        """Predict against a new conversation.
+    def predict(self, observations):
+        """Predict against a table of audio observations.
 
         Arguments:
-            conversation {Conversation} -- A conversation built from an audio
-            sample.
+            observations {np.array} -- A table of processed audio observations.
 
         Returns:
-            List[Phrase] -- A list of Phrases.
+            np.array -- An array of predicted speakers.
         """
-        # Predict against the conversation spectrograms.
-        X_hat = conversation.get_spectrograms(self.ms_per_observation)
-        result = self.model.predict(X_hat)
+        result = self.model.predict(observations)
         y_hat_indices = np.argmax(result, axis=1)
-        y_hat = np.array(self.speakers)[y_hat_indices]
 
-        # Convert to a list of phrases.
-        # TODO: This is extra work, we already converted the 
-        # observations when we called get_spectrograms. We can
-        # speed things up by somehow caching that result (or returning it)
-        # if it is prohibitably costly to regenerate these.
-        obs = conversation.get_observations(self.ms_per_observation)
-        return [Phrase(o, speaker) for o, speaker in zip(obs, y_hat)]
+        # Index into the speaker array using the predicted speaker indicies.
+        return np.array(self.speakers)[y_hat_indices]
 
     def __str__(self):
         return self.name

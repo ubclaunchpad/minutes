@@ -3,8 +3,7 @@ import os
 import shutil
 import tempfile
 
-
-from minutes import Speaker, Conversation
+from minutes import Speaker
 
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -21,9 +20,6 @@ SPEAKER1.add_audio(SPEAKER1_AUDIO)
 
 SPEAKER2 = Speaker('speaker2')
 SPEAKER2.add_audio(SPEAKER2_AUDIO)
-
-# Create conversation just once for all tests.
-CONVERSATION = Conversation(CONVERSATION_AUDIO)
 
 
 @contextlib.contextmanager

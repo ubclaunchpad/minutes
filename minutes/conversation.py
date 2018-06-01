@@ -1,39 +1,36 @@
 from minutes.audio import Audio
 
 
-class Conversation:
+class Phrase:
+    def __init__(self, observation, speaker):
+        """A phrase in a conversation, characterized by an audio segment
+        and a speaker.
 
-    def __init__(self, audio_loc):
+        Arguments:
+            observation {np.array} -- 1 dimensional audio sample.
+            speaker {Speaker} -- The inferred speaker for the audio segment.
+        """
+        self.observation = observation
+        self.speaker = speaker
+
+
+class Conversation(Audio):
+
+    def __init__(self, audio_loc, model):
         """Create a new conversation from audio sample.
 
         Arguments:
             audio_loc {str} -- The absolute location of an audio conversation
             sample.
+            model {Minutes} -- A model trained on speakers within this
+            conversation.
         """
-        self.audio = Audio(audio_loc)
+        self.model = model
+        super().__init__(audio_loc)
 
-    def get_spectrograms(self, ms_per_observation, verbose=False):
-        """Converts the conversation audio sample into an n x d matrix of
-        spectrograms.
+        # Predict against the conversation spectrograms.
+        raw, X_hat = self.get_observations(**model.preprocessing_params)
+        y_hat = model.predict(X_hat)
 
-        Keyword Arguments:
-            verbose {bool} -- (default: {False})
-            ms_per_observation {int} -- (default: {False})
-
-        Returns:
-            np.array -- An n x d matrix of spectrograms.
-        """
-        return self.audio.get_spectrograms(ms_per_observation, verbose)
-
-    def get_observations(self, ms_per_observation, verbose=False):
-        """Converts the conversation audio sample into an n x d matrix of
-        observations.
-
-        Keyword Arguments:
-            verbose {bool} -- (default: {False})
-            ms_per_observation {int} -- (default: {False})
-
-        Returns:
-            np.array -- An n x d matrix of observations.
-        """
-        return self.audio.get_observations(ms_per_observation, verbose)
+        # Convert to a list of phrases.
+        self.phrases = [Phrase(o, speaker) for o, speaker in zip(raw, y_hat)]

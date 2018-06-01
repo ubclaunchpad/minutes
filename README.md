@@ -6,9 +6,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/ubclaunchpad/minutes/badge.svg)](https://coveralls.io/github/ubclaunchpad/minutes)
 
-Audio speaker diarization library.
-
-## Under Construction!
+Audio speaker diarization library. 
 
 ## :running: Development
 
@@ -43,9 +41,6 @@ minutes.add_speakers([s1, s2])
 # Fit the model.
 minutes.fit()
 
-# Collect a new conversation for prediction.
-conversation = Conversation('/path/to/conversation.wav')
-
-# Create phrases from the conversation.
-phrases = minutes.phrases(conversation)
+# Predict against a new conversation had by speakers s1 and s2.
+conversation = Conversation('/path/to/conversation.wav', minutes)
 ```
