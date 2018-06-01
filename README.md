@@ -8,7 +8,7 @@
 
 > Jotting things down, so you don't have to.
 
-![Spectrogram](/.static/inertia-with-name.png)
+![Spectrogram](/.static/spec.png)
 
 Minutes is a speaker diarisation library. [Speaker diarisation](https://en.wikipedia.org/wiki/Speaker_diarisation) is the process
 of identifying different speakers in an audio segment. It is useful for
