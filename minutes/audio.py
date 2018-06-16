@@ -6,9 +6,12 @@ import scipy.signal as signal
 import scipy.stats as stats
 import soundfile as sf
 
+# Parameters for preprocessing audio files.
+PREPROCESSING_PARAMS = {'ms_per_observation'}
+
 
 class Audio:
-    """Internal audio maninpulation class. I reserve the right to change this
+    """Internal audio manipulation class. I reserve the right to change this
     API :)
     """
 

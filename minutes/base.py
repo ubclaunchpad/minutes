@@ -11,6 +11,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from minutes.models import MINUTES_BASE_MODEL_DIRECTORY
+from minutes.audio import PREPROCESSING_PARAMS
 
 
 class BaseModel:
@@ -31,9 +32,7 @@ class BaseModel:
         """
         return {
             i: getattr(self, i) for i in self.intialization_params
-            if i in {
-                'ms_per_observation',
-            }
+            if i in PREPROCESSING_PARAMS
         }
 
     @property
