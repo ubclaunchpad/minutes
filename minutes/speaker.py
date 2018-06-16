@@ -23,10 +23,13 @@ class Speaker:
         """
         self.audio += Audio(audio_loc),
 
-    def get_observations(self, ms_per_observation, verbose=False):
-        obs = [a.get_spectrograms(ms_per_observation, verbose)
-               for a in self.audio]
-        return np.concatenate(obs)
+    def get_observations(self, **preprocessing_params):
+        raw, processed = [], []
+        for a in self.audio:
+            r, p = a.get_observations(**preprocessing_params)
+            raw += r,
+            processed += p,
+        return np.concatenate(raw), np.concatenate(processed)
 
     def __eq__(self, other):
         return self.name == other.name

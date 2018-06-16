@@ -6,9 +6,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/ubclaunchpad/minutes/badge.svg)](https://coveralls.io/github/ubclaunchpad/minutes)
 
-Audio speaker diarization library.
-
-## Under Construction!
+Audio speaker diarization library. 
 
 ## :running: Development
 
@@ -43,9 +41,25 @@ minutes.add_speakers([s1, s2])
 # Fit the model.
 minutes.fit()
 
-# Collect a new conversation for prediction.
-conversation = Conversation('/path/to/conversation.wav')
+# Predict against a new conversation had by speakers s1 and s2.
+conversation = Conversation('/path/to/conversation.wav', minutes)
+```
 
-# Create phrases from the conversation.
-phrases = minutes.phrases(conversation)
+## Reproducibility
+
+If you want to make sure your `Minutes` models are reprodicible, we recommend
+setting the `numpy` and `tensorflow` state.
+
+```py
+import numpy as np
+import tensorflow as tf
+from minutes import Minutes
+
+state = 42
+np.random.seed(state)
+tf.set_random_seed(state)
+
+# Ensure the test data are generated deterministically by setting the Minutes
+# state as well.
+minutes = Minutes(parent='cnn', random_state=state)
 ```

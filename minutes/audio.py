@@ -6,8 +6,14 @@ import scipy.signal as signal
 import scipy.stats as stats
 import soundfile as sf
 
+# Parameters for preprocessing audio files.
+PREPROCESSING_PARAMS = {'ms_per_observation'}
+
 
 class Audio:
+    """Internal audio manipulation class. I reserve the right to change this
+    API :)
+    """
 
     def __init__(self, audio_loc):
         if os.path.isdir(audio_loc):
@@ -40,19 +46,19 @@ class Audio:
         """
         return int(self.rate * ms_per_observation / 1000.)
 
-    def get_spectrograms(self, ms_per_observation, verbose=False):
-        """Converts a internal table of raw audio audio phrases into with
-        one spectrogram per row.
+    def get_observations(self, ms_per_observation):
+        """Converts a internal raw audio vector into table with
+        one spectrogram per row. Also returns raw observations.
 
         Arguments:
             ms_per_observation {int} -- The number of desired ms per obs.
 
         Returns:
-            np.array -- An array of spectrograms, one per row. The width
-            of each spectrogram depends on the ms_per_observation,
-            The number of rows depends on the length of the audio file
-            and the ms per observations.
+            raw -- The raw audio observation table.
+            processed -- An array of spectrograms, one per row. The width
+            of each spectrogram depends on the ms_per_observation.
         """
+        # Reshape for processing into spectrograms.
         d = self.samples_per_observation(ms_per_observation)
         N = len(self.data) // d
 
@@ -65,17 +71,14 @@ class Audio:
         # Truncate last (partial) observation.
         data = data[:N * d]
 
-        if verbose:
-            t = len(self.data) - (N * d)
-            print('Truncating {} bytes from end of sample'.format(t))
-
         # Reshape for processing into spectrograms.
-        data = data.reshape((N, d))
+        raw = data.reshape((N, d))
 
         def spec_from_row(row):
             _, _, Sxx = signal.spectrogram(row)
             return Sxx
 
         # This is very slow! Perhaps some logging?
-        rows = (spec_from_row(row) for row in data)
-        return np.array([x for x in rows])
+        rows = (spec_from_row(row) for row in raw)
+        processed = np.array([x for x in rows])
+        return raw, processed

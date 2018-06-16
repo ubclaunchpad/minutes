@@ -3,7 +3,7 @@ import keras
 
 def copy_model(model):
     """Returns a copy of the model.
-    
+
     Arguments:
         model {keras.Sequential} -- A model for copying.
     """

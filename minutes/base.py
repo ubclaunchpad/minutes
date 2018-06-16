@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 
 from keras import backend as K
 from keras.models import Sequential, load_model
@@ -12,6 +11,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from minutes.models import MINUTES_BASE_MODEL_DIRECTORY
+from minutes.audio import PREPROCESSING_PARAMS
 
 
 class BaseModel:
@@ -23,6 +23,17 @@ class BaseModel:
         'test_size',
         'random_state',
     }
+
+    @property
+    def preprocessing_params(self):
+        """Returns a mapping of parameters that are required to do preprocessing
+        of audio data suitable for this model. Useful as kwargs to audio
+        manipulation classes.
+        """
+        return {
+            i: getattr(self, i) for i in self.intialization_params
+            if i in PREPROCESSING_PARAMS
+        }
 
     @property
     def fitted(self):
@@ -63,7 +74,7 @@ class BaseModel:
     def __init__(self, name, ms_per_observation=3000, test_size=0.33,
                  random_state=42):
         self.name = name
-        self.speakers = set()
+        self.speakers = []
         self.test_size = test_size
         self.random_state = random_state
         self.ms_per_observation = ms_per_observation
@@ -78,7 +89,7 @@ class BaseModel:
         """
         if speaker in self.speakers:
             raise LookupError(f'Speaker {speaker.name} already added.')
-        self.speakers.add(speaker)
+        self.speakers.append(speaker)
 
     def add_speakers(self, speakers):
         """Add a collection of speakers to the model.
@@ -98,8 +109,12 @@ class BaseModel:
             y -- a categorical one-hot encoding of different speakers
             numbered 1..k.
         """
-        obs = [s.get_observations(self.ms_per_observation)
-               for s in self.speakers]
+        obs = []
+        for s in self.speakers:
+            _, processed = s.get_observations(**self.preprocessing_params)
+            obs += processed,
+
+        # Generate and flatten labels.
         labels = [[i] * len(o) for i, o in enumerate(obs)]
         flattened_labels = [j for i in labels for j in i]
 
@@ -153,3 +168,21 @@ class BaseModel:
         # Save internal model.
         if self.model is not None:
             self.model.save(os.path.join(self.home, 'keras.h5'))
+
+    def predict(self, observations):
+        """Predict against a table of audio observations.
+
+        Arguments:
+            observations {np.array} -- A table of processed audio observations.
+
+        Returns:
+            np.array -- An array of predicted speakers.
+        """
+        result = self.model.predict(observations)
+        y_hat_indices = np.argmax(result, axis=1)
+
+        # Index into the speaker array using the predicted speaker indicies.
+        return np.array(self.speakers)[y_hat_indices]
+
+    def __str__(self):
+        return self.name

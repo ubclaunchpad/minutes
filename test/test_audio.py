@@ -16,6 +16,6 @@ def test_samples_per_observation():
 
 def test_get_spectrograms():
     audio = Audio(c.SPEAKER1_AUDIO)
-    spec = audio.get_spectrograms(3000)
+    _, spec = audio.get_observations(3000)
     assert spec.shape == (5, 129, 214)
     assert spec.dtype == np.float64

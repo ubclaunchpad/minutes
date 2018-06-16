@@ -31,12 +31,13 @@ class Minutes(BaseModel):
 
         # Load in parent, copy in fixed parameters.
         self.parent = BaseModel.load_model(parent)
-        self.ms_per_observation = self.parent.ms_per_observation
 
-        self.model = None
-        self.speakers = set()
-        self.test_size = test_size
-        self.random_state = random_state
+        super().__init__(
+            self.parent.name + '-child',
+            self.parent.ms_per_observation,
+            test_size,
+            random_state,
+        )
 
     def fit(self, verbose=0):
         """Trains the model, given the speakers currently added."""
@@ -72,14 +73,3 @@ class Minutes(BaseModel):
             batch_size=16,
             verbose=verbose
         )
-
-    def phrases(self, conversation):
-        """Predict against a new conversation.
-
-        Arguments:
-            conversation {Conversation} -- A conversation built from an audio
-            sample.
-
-        Returns: <TODO>
-        """
-        pass  # TODO
