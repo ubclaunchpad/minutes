@@ -3,6 +3,9 @@ import os
 import shutil
 import tempfile
 
+import numpy as np
+import tensorflow as tf
+
 from minutes import Speaker
 
 
@@ -20,6 +23,10 @@ SPEAKER1.add_audio(SPEAKER1_AUDIO)
 
 SPEAKER2 = Speaker('speaker2')
 SPEAKER2.add_audio(SPEAKER2_AUDIO)
+
+RANDOM_STATE = 42
+np.random.seed(RANDOM_STATE)
+tf.set_random_seed(RANDOM_STATE)
 
 
 @contextlib.contextmanager

@@ -30,8 +30,8 @@ def test_phrases():
         conversation = Conversation(c.CONVERSATION_AUDIO, minutes)
         raw, _ = conversation.get_observations(**minutes.preprocessing_params)
         assert len(conversation.phrases) == len(raw)
-        print(conversation.phrases)
 
-        # Make sure we ony predicted on speaker 1 and 2.
+        # Make sure we predicted some subset of the acceptable values.
         names = [p.speaker.name for p in conversation.phrases]
-        assert sorted(list(np.unique(names))) == ['speaker1', 'speaker2']
+        expected = {'speaker1', 'speaker2'}
+        assert set(np.unique(names)) <= expected

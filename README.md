@@ -44,3 +44,22 @@ minutes.fit()
 # Predict against a new conversation had by speakers s1 and s2.
 conversation = Conversation('/path/to/conversation.wav', minutes)
 ```
+
+## Reproducibility
+
+If you want to make sure your `Minutes` models are reprodicible, we recommend
+setting the `numpy` and `tensorflow` state.
+
+```py
+import numpy as np
+import tensorflow as tf
+from minutes import Minutes
+
+state = 42
+np.random.seed(state)
+tf.set_random_seed(state)
+
+# Ensure the test data are generated deterministically by setting the Minutes
+# state as well.
+minutes = Minutes(parent='cnn', random_state=state)
+```
