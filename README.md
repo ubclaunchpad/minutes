@@ -1,14 +1,29 @@
 # minutes
 
-[![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
-
 [![Build Status](https://travis-ci.org/ubclaunchpad/minutes.svg?branch=master)](https://travis-ci.org/ubclaunchpad/minutes)
-
 [![Coverage Status](https://coveralls.io/repos/github/ubclaunchpad/minutes/badge.svg)](https://coveralls.io/github/ubclaunchpad/minutes)
 
-Audio speaker diarization library.
+> Jotting things down, so you don't have to.
 
-## Under Construction!
+![Spectrogram](/.static/spec.png)
+
+Minutes is a speaker diarisation library. [Speaker diarisation](https://en.wikipedia.org/wiki/Speaker_diarisation) is the process
+of identifying different speakers in an audio segment. It is useful for
+making transcriptions of conversations meaningful by tagging homogenous
+sections of the conversation with the appropriate speaker.
+
+For more information about Minutes, and how it works, check out our [Medium
+post](https://medium.com/ubc-launch-pad-software-engineering-blog/speaker-diarisation-using-transfer-learning-47ca1a1226f4)!
+
+
+## :point_up: Installation
+
+Requires Python 3.6!
+
+```bash
+# Currently we recommend running using the pipenv shell below.
+python setup.py install
+```
 
 ## :running: Development
 

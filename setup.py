@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='minutes',
     version='0.0.1',
-    description='Speaker diarization via transfer learning',
+    description='Speaker diarisation via transfer learning',
     author='UBC Launch Pad',
     author_email='team@ubclaunchpad.com',
     url='https://www.ubclaunchpad.com',
